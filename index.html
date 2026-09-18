@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Matematik Tingkatan 3 — Peta Modul</title>
+<style>
+  :root{
+    --bg: #0d1117; --surface: #161b22; --surface-2: #1f2733;
+    --border: #30363d; --text: #e6edf3; --muted: #8b949e;
+    --accent: #a78bfa; --gold: #f4b942;
+  }
+  *{ box-sizing: border-box; }
+  html,body{ margin:0; padding:0; }
+  body{
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    line-height: 1.5;
+    padding: 16px 14px 48px;
+    max-width: 720px;
+    margin: 0 auto;
+  }
+  h1{ font-size: 1.4rem; margin: 8px 0 4px; text-align:center; }
+  .subtitle{ text-align:center; color: var(--muted); font-size:0.88rem; margin-bottom:20px; }
+  .searchbox{
+    width:100%; padding:12px 14px; border-radius:12px; border:1px solid var(--border);
+    background: var(--surface); color: var(--text); font-size:1rem; margin-bottom:18px;
+  }
+  .no-result{ text-align:center; color: var(--muted); padding:20px; display:none; }
+  .bab{
+    border:1px solid var(--border); border-radius:14px; margin-bottom:10px;
+    overflow:hidden; background: var(--surface);
+  }
+  .bab > summary{
+    padding:13px 16px; font-weight:700; font-size:0.98rem; cursor:pointer;
+    list-style:none; display:flex; align-items:center; justify-content:space-between;
+    background: var(--surface-2); border-left:4px solid var(--accent);
+  }
+  .bab > summary::-webkit-details-marker{ display:none; }
+  .bab > summary::after{ content:"▸"; transition: transform 0.2s; color: var(--muted); }
+  .bab[open] > summary::after{ transform: rotate(90deg); }
+  .count-pill{
+    font-size:0.7rem; font-weight:600; color: var(--muted); background: var(--bg);
+    padding:2px 8px; border-radius:999px; margin-left:8px;
+  }
+  .sk-list{ padding: 10px 12px 12px; }
+  .sk-link{
+    display:block; padding:10px 12px; margin:6px 0; border-radius:10px;
+    background: var(--surface-2); color: var(--text); text-decoration:none;
+    font-size:0.9rem; border:1px solid var(--border);
+  }
+  .sk-link:active{ transform: scale(0.98); }
+  .sk-code{ color: var(--gold); font-weight:700; margin-right:6px; }
+  .footer-note{ text-align:center; font-size:0.75rem; color: var(--muted); margin-top:24px; }
+</style>
+</head>
+<body>
+
+<h1>📙 Matematik Tingkatan 3</h1>
+<p class="subtitle">Peta Modul Gamifikasi KSSM · 17 Modul · 9 Bab</p>
+
+<input type="text" class="searchbox" id="searchBox" placeholder="🔍 Cari bab atau SK (cth: indeks, lokus, 6.3)..." oninput="filterModules()">
+<p class="no-result" id="noResult">Tiada modul dijumpai.</p>
+
+<details class="bab" open><summary>Bab 1 — Indeks <span class="count-pill">2 SK</span></summary><div class="sk-list">
+  <a class="sk-link" href="T3_SK1.1_TatatandaIndeks_Tingkatan3.html"><span class="sk-code">1.1</span>Tatatanda Indeks</a>
+  <a class="sk-link" href="T3_SK1.2_HukumIndeks_Tingkatan3.html"><span class="sk-code">1.2</span>Hukum Indeks</a>
+</div></details>
+
+<details class="bab"><summary>Bab 2 — Bentuk Piawai <span class="count-pill">2 SK</span></summary><div class="sk-list">
+  <a class="sk-link" href="T3_SK2.1_AngkaBererti_Tingkatan3.html"><span class="sk-code">2.1</span>Angka Bererti</a>
+  <a class="sk-link" href="T3_SK2.2_BentukPiawai_Tingkatan3.html"><span class="sk-code">2.2</span>Bentuk Piawai</a>
+</div></details>
+
+<details class="bab"><summary>Bab 3 — Matematik Pengguna <span class="count-pill">2 SK</span></summary><div class="sk-list">
+  <a class="sk-link" href="T3_SK3.1_SimpananPelaburan_Tingkatan3.html"><span class="sk-code">3.1</span>Simpanan & Pelaburan</a>
+  <a class="sk-link" href="T3_SK3.2_KreditHutang_Tingkatan3.html"><span class="sk-code">3.2</span>Kredit & Hutang</a>
+</div></details>
+
+<details class="bab"><summary>Bab 4 — Lukisan Berskala <span class="count-pill">1 SK</span></summary><div class="sk-list">
+  <a class="sk-link" href="T3_SK4.1_LukisanBerskala_Tingkatan3.html"><span class="sk-code">4.1</span>Lukisan Berskala</a>
+</div></details>
+
+<details class="bab"><summary>Bab 5 — Nisbah Trigonometri <span class="count-pill">1 SK</span></summary><div class="sk-list">
+  <a class="sk-link" href="T3_SK5.1_NisbahTrigonometri_Tingkatan3.html"><span class="sk-code">5.1</span>Nisbah Trigonometri</a>
+</div></details>
+
+<details class="bab"><summary>Bab 6 — Sudut dan Tangen bagi Bulatan <span class="count-pill">4 SK</span></summary><div class="sk-list">
+  <a class="sk-link" href="T3_SK6.1_SudutLilitanPusat_Tingkatan3.html"><span class="sk-code">6.1</span>Sudut Lilitan & Sudut Pusat</a>
+  <a class="sk-link" href="T3_SK6.2_SisiEmpatKitaran_Tingkatan3.html"><span class="sk-code">6.2</span>Sisi Empat Kitaran</a>
+  <a class="sk-link" href="T3_SK6.3_TangenBulatan_Tingkatan3.html"><span class="sk-code">6.3</span>Tangen kepada Bulatan</a>
+  <a class="sk-link" href="T3_SK6.4_SudutTangenBulatan_Tingkatan3.html"><span class="sk-code">6.4</span>Sudut & Tangen Bulatan (Gabungan)</a>
+</div></details>
+
+<details class="bab"><summary>Bab 7 — Pelan dan Dongakan <span class="count-pill">2 SK</span></summary><div class="sk-list">
+  <a class="sk-link" href="T3_SK7.1_UnjuranOrtogon_Tingkatan3.html"><span class="sk-code">7.1</span>Unjuran Ortogon</a>
+  <a class="sk-link" href="T3_SK7.2_PelanDongakan_Tingkatan3.html"><span class="sk-code">7.2</span>Pelan & Dongakan</a>
+</div></details>
+
+<details class="bab"><summary>Bab 8 — Lokus dalam Dua Dimensi <span class="count-pill">2 SK</span></summary><div class="sk-list">
+  <a class="sk-link" href="T3_SK8.1_Lokus_Tingkatan3.html"><span class="sk-code">8.1</span>Lokus</a>
+  <a class="sk-link" href="T3_SK8.2_Lokus2D_Tingkatan3.html"><span class="sk-code">8.2</span>Lokus dalam Dua Dimensi</a>
+</div></details>
+
+<details class="bab"><summary>Bab 9 — Garis Lurus <span class="count-pill">1 SK</span></summary><div class="sk-list">
+  <a class="sk-link" href="T3_SK9.1_GarisLurus_Tingkatan3.html"><span class="sk-code">9.1</span>Garis Lurus</a>
+</div></details>
+
+<p class="footer-note">Matematik Tingkatan 3 · 17 Modul Gamifikasi · KSSM/KP2027<br>Dibina oleh Cg Din</p>
+
+<script>
+function filterModules(){
+  const q = document.getElementById('searchBox').value.trim().toLowerCase();
+  const babs = document.querySelectorAll('.bab');
+  let anyVisible = false;
+
+  babs.forEach(bab => {
+    const babTitle = bab.querySelector('summary').textContent.toLowerCase();
+    const links = bab.querySelectorAll('.sk-link');
+    let babHasMatch = q === "" ? true : babTitle.includes(q);
+
+    links.forEach(link => {
+      const linkText = link.textContent.toLowerCase();
+      const matches = q === "" || linkText.includes(q) || babTitle.includes(q);
+      link.style.display = matches ? "block" : "none";
+      if(matches) babHasMatch = true;
+    });
+
+    bab.style.display = babHasMatch ? "block" : "none";
+    if(babHasMatch){
+      anyVisible = true;
+      if(q !== "") bab.setAttribute('open', '');
+    } else {
+      if(q !== "") bab.removeAttribute('open');
+    }
+  });
+
+  document.getElementById('noResult').style.display = anyVisible ? "none" : "block";
+}
+</script>
+
+</body>
+</html>

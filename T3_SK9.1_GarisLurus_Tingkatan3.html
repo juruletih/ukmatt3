@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Peta Bintang: Garis Lurus | SK 9.1 (T3)</title>
+<style>
+  :root{
+    --bg: #0d1420; --bg-alt: #131f30; --surface: #192a40; --surface-2: #1f334d;
+    --border: #2f4a68; --text: #eaf1fb; --muted: #9db3ce;
+    --positive: #38bdf8; --positive-dark: #1a6f8f;
+    --negative: #fb7185; --negative-dark: #b8324a;
+    --gold: #f4b942; --radius: 14px; --maxw: 560px;
+  }
+  *{ box-sizing: border-box; }
+  html,body{ margin:0; padding:0; }
+  body{
+    background: radial-gradient(ellipse at top, #17273e 0%, var(--bg) 55%);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    min-height: 100vh; display:flex; justify-content:center; line-height:1.5;
+  }
+  #app{ width:100%; max-width: var(--maxw); min-height:100vh; padding: 18px 18px 40px; position:relative; }
+  h1,h2,h3{ margin:0 0 8px; font-weight:700; letter-spacing:-0.01em; }
+  h1{ font-size:1.5rem; } h2{ font-size:1.2rem; } h3{ font-size:1.02rem; }
+  p{ margin:0 0 12px; color: var(--text); }
+  .muted{ color: var(--muted); font-size:0.9rem; }
+  .card{ background: var(--surface); border:1px solid var(--border); border-radius: var(--radius); padding:16px; margin-bottom:14px; }
+  .pill{ display:inline-block; padding:3px 10px; border-radius:999px; font-size:0.72rem; font-weight:700; letter-spacing:0.02em; background: var(--surface-2); color: var(--gold); border:1px solid var(--border); }
+  .btn{ display:block; width:100%; padding:14px 16px; border-radius: 12px; border:none; font-size:1rem; font-weight:700; cursor:pointer; margin-top:10px; -webkit-tap-highlight-color: transparent; }
+  .btn:active{ transform: scale(0.98); }
+  .btn-primary{ background: var(--positive); color:#03202c; }
+  .btn-ghost{ background: transparent; color: var(--muted); border:1px solid var(--border); }
+  .btn-gold{ background: var(--gold); color:#3a2600; }
+  .btn-option{ display:block; width:100%; text-align:left; background: var(--surface-2); color: var(--text); border:1px solid var(--border); border-radius:12px; padding:13px 14px; margin-top:9px; font-size:0.98rem; cursor:pointer; }
+  .btn-option.correct{ background: var(--positive-dark); border-color: var(--positive); }
+  .btn-option.wrong{ background: var(--negative-dark); border-color: var(--negative); }
+  .btn-option.disabled{ pointer-events:none; opacity:0.85; }
+  input[type=text]{ width:100%; padding:13px 14px; border-radius:12px; border:1px solid var(--border); background: var(--surface-2); color: var(--text); font-size:1rem; margin-bottom:6px; }
+  label{ font-size:0.85rem; color: var(--muted); display:block; margin-bottom:5px; margin-top:10px; }
+  .topbar{ display:flex; align-items:center; justify-content:space-between; margin-bottom:14px; gap:10px; }
+  .topbar .back{ background:none; border:none; color: var(--muted); font-size:0.95rem; cursor:pointer; padding:6px 0; }
+  .progressbar{ width:100%; height:8px; background: var(--surface-2); border-radius:999px; overflow:hidden; margin: 8px 0 16px; }
+  .progressbar > div{ height:100%; background: linear-gradient(90deg, var(--positive), var(--gold)); }
+  .databox{ background: var(--bg-alt); border-left:4px solid var(--gold); border-radius:8px; padding:12px 14px; margin:10px 0; font-size:0.95rem; }
+  .databox.neg{ border-left-color: var(--negative); }
+  .databox.pos{ border-left-color: var(--positive); }
+  .feedback{ border-radius:10px; padding:12px 14px; margin-top:10px; font-size:0.92rem; font-weight:600; }
+  .feedback.ok{ background: rgba(56,189,248,0.15); color: var(--positive); border:1px solid var(--positive); }
+  .feedback.no{ background: rgba(251,113,133,0.15); color: var(--negative); border:1px solid var(--negative); }
+  .hint-box{ background: var(--surface-2); border:1px dashed var(--gold); border-radius:10px; padding:10px 12px; margin-top:8px; font-size:0.88rem; color: var(--gold); }
+  .badge-level{ display:inline-block; font-size:0.68rem; font-weight:800; letter-spacing:0.03em; padding:2px 8px; border-radius:6px; margin-bottom:8px; }
+  .lvl-rendah{ background:#264d3a; color:#7be0a8; }
+  .lvl-sederhana{ background:#2a4763; color:#7fc4f7; }
+  .lvl-tinggi{ background:#5a3a1f; color:#f7b563; }
+  .lvl-kbat{ background:#4a2338; color:#f78fc0; }
+  .statrow{ display:flex; gap:10px; margin-bottom:14px; }
+  .statbox{ flex:1; background: var(--surface); border:1px solid var(--border); border-radius:12px; padding:10px; text-align:center; }
+  .statbox .num{ font-size:1.3rem; font-weight:800; color: var(--gold); }
+  .statbox .lbl{ font-size:0.7rem; color: var(--muted); }
+  .scorelist{ max-height:340px; overflow-y:auto; border:1px solid var(--border); border-radius:12px; }
+  .scoreitem{ padding:10px 12px; border-bottom:1px solid var(--border); font-size:0.85rem; }
+  .scoreitem:last-child{ border-bottom:none; }
+  .scoreitem .ok-tag{ color: var(--positive); font-weight:700; }
+  .scoreitem .no-tag{ color: var(--negative); font-weight:700; }
+  .version-badge{ position:absolute; top:10px; right:10px; font-size:0.62rem; background: var(--surface-2); color: var(--muted); border:1px solid var(--border); padding:3px 7px; border-radius:6px; }
+  .module-row{ display:flex; align-items:center; justify-content:space-between; background: var(--surface); border:1px solid var(--border); border-radius:12px; padding:13px 14px; margin-bottom:10px; cursor:pointer; }
+  .module-row.locked{ opacity:0.45; cursor:not-allowed; }
+  .footer-note{ text-align:center; font-size:0.72rem; color: var(--muted); margin-top:24px; }
+</style>
+</head>
+<body>
+<div id="app"></div>
+<script>
+/* =========================================================
+   PETA BINTANG: Garis Lurus
+   SK 9.1 | KSSM Matematik Tingkatan 3
+   VERSI v1.0
+   ========================================================= */
+const VERSION = "v1.0";
+const STORAGE_KEY = "peta_bintang_sk91_t3_state";
+
+function freshState(){
+  return {
+    path:["welcome"], name:"", kelas:"", startTime:null, endTime:null,
+    diagLog:[], practiceLog:[], bankLog:[], exitLog:[],
+    moduleDone:{ A:false,B:false,C:false,D:false }, moduleIndex:0, qIndex:0,
+    hintsUsedTotal:0, version: VERSION
+  };
+}
+let state = loadState();
+function loadState(){
+  try{
+    const saved = localStorage.getItem(STORAGE_KEY);
+    if(!saved) return freshState();
+    return Object.assign(freshState(), JSON.parse(saved));
+  }catch(e){ return freshState(); }
+}
+function saveState(){ try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }catch(e){} }
+function goTo(screen, resetSub){ if(resetSub){ state.qIndex=0; } state.path.push(screen); saveState(); render(); }
+function goBack(){ if(state.path.length>1){ state.path.pop(); } saveState(); render(); }
+function currentScreen(){ return state.path[state.path.length-1]; }
+
+/* ---------- DATA SOALAN ---------- */
+
+// Modul A — 9.1.1 Hubungan y=mx+c dgn kecerunan & pintasan-y
+const modA = [
+  { id:"A1", stem:"Dalam persamaan y=mx+c, 'm' mewakili:", options:["kecerunan garis","pintasan-y","pintasan-x","nilai y"], correct:0, explain:"m ialah kecerunan (gradient)." },
+  { id:"A2", stem:"Dalam persamaan y=mx+c, 'c' mewakili:", options:["pintasan-y (nilai y bila x=0)","kecerunan","pintasan-x","nilai x"], correct:0, explain:"c ialah pintasan-y." },
+  { id:"A3", stem:"Garis dengan persamaan y=3x+5 mempunyai kecerunan:", options:["3","5","8","1/3"], correct:0, explain:"m=3 (pekali x)." }
+];
+
+// Modul B — 9.1.2 Persamaan bentuk lain
+const modB = [
+  { id:"B1", stem:"Persamaan 2x+3y=12 ditukar kepada bentuk y=mx+c. Apakah nilai m?", options:["-2/3","2/3","3/2","-3/2"], correct:0, explain:"3y=-2x+12 → y=-2/3x+4. m=-2/3." },
+  { id:"B2", stem:"Persamaan x/4+y/6=1 menunjukkan pintasan-x dan pintasan-y masing-masing:", options:["4 dan 6","6 dan 4","4/6 dan 1","1 dan 1"], correct:0, explain:"Bentuk x/a+y/b=1: a=pintasan-x, b=pintasan-y." },
+  { id:"B3", stem:"Tukar y=2x-4 kepada bentuk ax+by=c.", options:["2x-y=4","2x+y=4","x-2y=4","2x-y=-4"], correct:0, explain:"y=2x-4 → 2x-y=4." }
+];
+
+// Modul C — 9.1.3-9.1.4 Hubungan titik dgn persamaan, kecerunan garis selari
+const modC = [
+  { id:"C1", stem:"Titik (2,7) terletak pada garis y=3x+1. Adakah ini benar?", options:["Ya, kerana 3(2)+1=7","Tidak","Tidak boleh ditentukan","Ya, sebab lain"], correct:0, explain:"3(2)+1=7, sepadan dengan y=7." },
+  { id:"C2", stem:"Dua garis selari mempunyai kecerunan yang:", options:["SAMA","berbeza","bertentangan tanda","hasil darab -1"], correct:0, explain:"Garis selari: kecerunan sama." },
+  { id:"C3", stem:"Garis L1: y=4x+2. Garis L2 selari dengan L1. Apakah kecerunan L2?", options:["4","2","-4","1/4"], correct:0, explain:"Garis selari kongsi kecerunan sama: m=4." }
+];
+
+// Modul D — 9.1.5-9.1.7 Tentukan persamaan, titik persilangan, selesaikan masalah
+const modD = [
+  { id:"D1", stem:"Cari persamaan garis lurus dengan kecerunan 2 yang melalui titik (0,5).", options:["y=2x+5","y=5x+2","y=2x-5","y=-2x+5"], correct:0, explain:"Titik (0,5) ialah pintasan-y, jadi c=5: y=2x+5." },
+  { id:"D2", stem:"Cari titik persilangan bagi garis y=x+1 dan y=-x+5.", options:["(2,3)","(3,2)","(1,5)","(4,0)"], correct:0, explain:"x+1=-x+5 → 2x=4 → x=2, y=3." },
+  { id:"D3", stem:"Sebuah kedai mengenakan caj penghantaran RM10 (tetap) ditambah RM2 setiap kg. Jika y=jumlah caj dan x=berat (kg), persamaan yang sesuai ialah:", options:["y=2x+10","y=10x+2","y=2x-10","y=12x"], correct:0, explain:"Kadar per kg=kecerunan=2; caj tetap=pintasan-y=10." }
+];
+
+// Bank Soalan 4 Aras
+const bank = [
+  { level:"Rendah", id:"BR1", stem:"Dalam y=mx+c, m mewakili:", options:["kecerunan","pintasan-y","pintasan-x","nilai y"], correct:0, explain:"Definisi m." },
+  { level:"Rendah", id:"BR2", stem:"Dalam y=mx+c, c mewakili:", options:["pintasan-y","kecerunan","pintasan-x","nilai x"], correct:0, explain:"Definisi c." },
+  { level:"Sederhana", id:"BS1", stem:"Garis y=5x-3 mempunyai kecerunan:", options:["5","-3","3","1/5"], correct:0, explain:"m=5." },
+  { level:"Sederhana", id:"BS2", stem:"Dua garis selari mempunyai kecerunan yang:", options:["sama","berbeza","bertentangan","hasil darab -1"], correct:0, explain:"Sifat garis selari." },
+  { level:"Tinggi", id:"BT1", stem:"Tukar 4x+2y=8 kepada bentuk y=mx+c. Cari nilai m.", options:["-2","2","4","-4"], correct:0, explain:"2y=-4x+8 → y=-2x+4. m=-2." },
+  { level:"Tinggi", id:"BT2", stem:"Cari titik persilangan bagi garis y=2x-1 dan y=-x+5.", options:["(2,3)","(3,2)","(1,1)","(5,9)"], correct:0, explain:"2x-1=-x+5 → 3x=6 → x=2, y=3." },
+  { level:"KBAT", id:"BK1", stem:"Seorang murid mendakwa: \"Dua garis dengan pintasan-y yang SAMA semestinya SELARI.\" Betulkan kefahaman ini.", options:["Betul, sentiasa selari","Salah — dua garis selari ditentukan oleh KECERUNAN yang SAMA (nilai m), BUKAN pintasan-y (nilai c); dua garis boleh mempunyai pintasan-y sama tetapi kecerunan berbeza (bersilang di paksi-y), dan sebaliknya boleh selari dengan pintasan-y berbeza","Betul, kerana kedua-dua garis melalui paksi-y","Tidak boleh ditentukan"], correct:1, explain:"Keselarian ditentukan oleh kecerunan (m), bukan pintasan-y (c)." },
+  { level:"KBAT", id:"BK2", stem:"Sebuah syarikat teksi mengenakan caj RM3 (tambang minimum) ditambah RM1.50 setiap km. Jika seorang penumpang membayar RM12, berapakah jarak perjalanan (km)?", options:["6km","9km","4km","8km"], correct:0, explain:"12=1.5x+3 → 1.5x=9 → x=6km." }
+];
+
+// Tiket Keluar
+const exitQ = [
+  { id:"E1", stem:"Dalam y=mx+c, m mewakili:", options:["kecerunan","pintasan-y","pintasan-x","nilai y"], correct:0, explain:"Definisi m." },
+  { id:"E2", stem:"Garis y=7x+2 mempunyai kecerunan:", options:["7","2","9","1/7"], correct:0, explain:"m=7." },
+  { id:"E3", stem:"Dua garis selari mempunyai kecerunan yang:", options:["sama","berbeza","bertentangan","hasil darab -1"], correct:0, explain:"Sifat garis selari." }
+];
+
+function logAnswer(logArray, record){ logArray.push(record); saveState(); }
+
+/* ---------- RENDER UTAMA ---------- */
+function render(){
+  const app = document.getElementById("app");
+  const screen = currentScreen();
+  let html = "";
+  switch(screen){
+    case "welcome": html = screenWelcome(); break;
+    case "identitas": html = screenIdentitas(); break;
+    case "objektif": html = screenObjektif(); break;
+    case "diagnostic": html = screenDiagnostic(); break;
+    case "notes": html = screenNotes(); break;
+    case "moduleMenu": html = screenModuleMenu(); break;
+    case "moduleA": html = screenModule("A", modA, "9.1.1 Kecerunan & Pintasan-y"); break;
+    case "moduleB": html = screenModule("B", modB, "9.1.2 Bentuk Persamaan Lain"); break;
+    case "moduleC": html = screenModule("C", modC, "9.1.3–9.1.4 Titik & Garis Selari"); break;
+    case "moduleD": html = screenModule("D", modD, "9.1.5–9.1.7 Persamaan, Persilangan & Masalah"); break;
+    case "bankIntro": html = screenBankIntro(); break;
+    case "bank": html = screenBank(); break;
+    case "exitTicket": html = screenExit(); break;
+    case "summary": html = screenSummary(); break;
+    case "confirmReset": html = screenConfirmReset(); break;
+    default: html = screenWelcome();
+  }
+  app.innerHTML = `<div class="version-badge">🔖 VERSI: ${VERSION}</div>` + html;
+}
+
+/* ---------- WELCOME ---------- */
+function screenWelcome(){
+  return `
+    <div style="padding-top:50px; text-align:center;">
+      <div class="pill">PETA BINTANG</div>
+      <h1 style="margin-top:14px;">⭐ Garis Lurus</h1>
+      <p class="muted">Standard Kandungan 9.1<br>KSSM Matematik Tingkatan 3</p>
+      <div class="card" style="text-align:left; margin-top:24px;">
+        <h3>Apa yang menanti anda?</h3>
+        <p class="muted" style="margin-bottom:0;">Misi TERAKHIR anda! Kuasai persamaan garis lurus, kecerunan, dan titik persilangan untuk menamatkan pengembaraan Matematik Tingkatan 3!</p>
+      </div>
+      <button class="btn btn-primary" onclick="goTo('identitas')">Mula Tugasan Akhir →</button>
+    </div>
+  `;
+}
+
+/* ---------- IDENTITAS ---------- */
+function screenIdentitas(){
+  return `
+    <div class="topbar"><button class="back" onclick="goBack()">← Kembali</button></div>
+    <h2>Sebelum bermula...</h2>
+    <p class="muted">Isikan maklumat anda untuk rekod prestasi.</p>
+    <div class="card">
+      <label for="inpName">Nama</label>
+      <input type="text" id="inpName" placeholder="Nama penuh" value="${escapeHtml(state.name)}">
+      <label for="inpKelas">Kelas</label>
+      <input type="text" id="inpKelas" placeholder="Contoh: 3 Cemerlang" value="${escapeHtml(state.kelas)}">
+    </div>
+    <button class="btn btn-primary" onclick="submitIdentitas()">Sedia! Mulakan →</button>
+  `;
+}
+function submitIdentitas(){
+  const n = document.getElementById("inpName").value.trim();
+  const k = document.getElementById("inpKelas").value.trim();
+  if(!n || !k){ alertInline("Sila isikan Nama dan Kelas sebelum meneruskan."); return; }
+  state.name=n; state.kelas=k;
+  if(!state.startTime){ state.startTime = Date.now(); }
+  saveState(); goTo("objektif");
+}
+function alertInline(msg){
+  const card = document.querySelector(".card");
+  let warn = document.getElementById("inlineWarn");
+  if(!warn){ warn=document.createElement("div"); warn.id="inlineWarn"; warn.className="feedback no"; card.appendChild(warn); }
+  warn.textContent = msg;
+}
+
+/* ---------- OBJEKTIF ---------- */
+function screenObjektif(){
+  return `
+    <div class="topbar"><button class="back" onclick="goBack()">← Kembali</button></div>
+    <h2>🎯 Taklimat Misi</h2>
+    <div class="card">
+      <h3>Objektif Pembelajaran</h3>
+      <div class="databox">1. Membuat perkaitan antara y=mx+c dengan kecerunan dan pintasan-y.</div>
+      <div class="databox">2. Menyiasat dan mentafsir persamaan garis lurus dalam bentuk lain.</div>
+      <div class="databox">3. Menyiasat hubungan antara titik pada garis dengan persamaannya.</div>
+      <div class="databox">4. Menyiasat hubungan antara kecerunan garis selari.</div>
+      <div class="databox">5. Menentukan persamaan garis lurus dan titik persilangan dua garis.</div>
+      <div class="databox">6. Menyelesaikan masalah yang melibatkan garis lurus.</div>
+    </div>
+    <div class="card">
+      <h3>Kriteria Kejayaan</h3>
+      <p class="muted" style="margin-bottom:0;">Selesaikan sekurang-kurangnya 8 daripada 10 soalan dalam Bank Soalan dengan betul, merangkumi semua aras kesukaran.</p>
+    </div>
+    <button class="btn btn-primary" onclick="goTo('diagnostic')">Mula Semakan Awal →</button>
+  `;
+}
+
+/* ---------- SEMAKAN AWAL ---------- */
+const diagQ = [
+  { id:"DG1", stem:"Dalam y=mx+c, m mewakili:", options:["kecerunan","pintasan-y","pintasan-x","nilai y"], correct:0 },
+  { id:"DG2", stem:"Dalam y=mx+c, c mewakili:", options:["pintasan-y","kecerunan","pintasan-x","nilai x"], correct:0 },
+  { id:"DG3", stem:"Dua garis selari mempunyai kecerunan yang:", options:["sama","berbeza","bertentangan","hasil darab -1"], correct:0 }
+];
+function screenDiagnostic(){
+  const i = state.qIndex;
+  if(i >= diagQ.length){
+    return `<h2>✅ Semakan Awal Selesai</h2><p class="muted">Mari kukuhkan kefahaman dengan Nota Lengkap.</p><button class="btn btn-primary" onclick="goTo('notes')">Lihat Nota Lengkap →</button>`;
+  }
+  const q = diagQ[i];
+  return `
+    <div class="topbar"><span class="muted">Semakan Awal ${i+1}/${diagQ.length}</span></div>
+    <div class="progressbar"><div style="width:${(i/diagQ.length)*100}%"></div></div>
+    <div class="card"><h3>${q.stem}</h3><div>${q.options.map((o,idx)=>`<button class="btn-option" onclick="answerDiagnostic(${idx})">${o}</button>`).join("")}</div></div>
+  `;
+}
+function answerDiagnostic(idx){
+  const q = diagQ[state.qIndex];
+  const correct = idx===q.correct;
+  logAnswer(state.diagLog, { id:q.id, question:q.stem, chosen:q.options[idx], correctAns:q.options[q.correct], correct, level:"Diagnostik" });
+  state.qIndex++; saveState(); render();
+}
+
+/* ---------- NOTA LENGKAP ---------- */
+function screenNotes(){
+  return `
+    <div class="topbar"><button class="back" onclick="goBack()">← Kembali</button></div>
+    <h2>📘 Nota Lengkap: Garis Lurus</h2>
+    <div class="card">
+      <h3>1. Bentuk y=mx+c</h3>
+      <div class="databox pos">m = kecerunan (gradient)</div>
+      <div class="databox pos">c = pintasan-y (nilai y bila x=0)</div>
+    </div>
+    <div class="card">
+      <h3>2. Bentuk Persamaan Lain</h3>
+      <p><b>Contoh:</b> Tukar 2x+3y=12 kepada y=mx+c.</p>
+      <div class="databox">3y=-2x+12 → y=-2/3x+4. m=-2/3, c=4</div>
+      <div class="databox">Bentuk x/a+y/b=1: a=pintasan-x, b=pintasan-y</div>
+    </div>
+    <div class="card">
+      <h3>3. Garis Selari & Titik Persilangan</h3>
+      <div class="databox pos">Garis selari: KECERUNAN SAMA (m1=m2)</div>
+      <p><b>Contoh:</b> Cari persilangan y=x+1 dan y=-x+5.</p>
+      <div class="databox">x+1=-x+5 → 2x=4 → x=2, y=3. Titik: (2,3)</div>
+      <p class="muted" style="margin-top:8px;"><b>⚠️ Miskonsepsi biasa:</b> "Pintasan-y sama = selari" — INI SALAH. Keselarian ditentukan oleh KECERUNAN sama, bukan pintasan-y.</p>
+    </div>
+    <div class="card">
+      <h3>📌 Rumusan Pantas</h3>
+      <div class="databox">• y=mx+c: m=kecerunan, c=pintasan-y</div>
+      <div class="databox">• Garis selari: m1=m2</div>
+      <div class="databox">• Persilangan: samakan dua persamaan y</div>
+    </div>
+    <button class="btn btn-primary" onclick="goTo('moduleMenu')">Faham, Sedia untuk Latihan →</button>
+  `;
+}
+
+/* ---------- MENU MODUL ---------- */
+function screenModuleMenu(){
+  const items = [
+    {key:"A", label:"Modul A · Kecerunan & Pintasan-y", sp:"9.1.1", screen:"moduleA"},
+    {key:"B", label:"Modul B · Bentuk Persamaan Lain", sp:"9.1.2", screen:"moduleB"},
+    {key:"C", label:"Modul C · Titik & Garis Selari", sp:"9.1.3–9.1.4", screen:"moduleC"},
+    {key:"D", label:"Modul D · Persamaan, Persilangan & Masalah", sp:"9.1.5–9.1.7", screen:"moduleD"}
+  ];
+  const doneCount = Object.values(state.moduleDone).filter(Boolean).length;
+  const rows = items.map((it, idx)=>{
+    const done = state.moduleDone[it.key];
+    const prevDone = idx===0 ? true : state.moduleDone[items[idx-1].key];
+    const locked = !prevDone && !done;
+    return `<div class="module-row ${locked?'locked':''}" onclick="${locked? '': `openModule('${it.screen}')`}">
+      <div><div style="font-weight:700;">${it.label}</div><div class="muted" style="font-size:0.78rem;">SP ${it.sp}</div></div>
+      <div>${done ? "✅" : (locked ? "🔒" : "▶️")}</div>
+    </div>`;
+  }).join("");
+  return `
+    <div class="topbar"><span class="muted">Latihan Berpandu</span></div>
+    <h2>🧭 Peta Modul</h2>
+    <div class="progressbar"><div style="width:${(doneCount/4)*100}%"></div></div>
+    ${rows}
+    ${doneCount===4 ? `<button class="btn btn-primary" onclick="goTo('bankIntro')">Semua Modul Selesai — Teruskan →</button>` : `<p class="muted" style="text-align:center;">Selesaikan semua modul untuk buka Bank Soalan.</p>`}
+  `;
+}
+function openModule(screen){ state.qIndex=0; goTo(screen); }
+
+/* ---------- MODUL GENERIK ---------- */
+function getModuleData(key){
+  if(key==="A") return modA;
+  if(key==="B") return modB;
+  if(key==="C") return modC;
+  if(key==="D") return modD;
+  return [];
+}
+function screenModule(key, questions, title){
+  const i = state.qIndex;
+  if(i >= questions.length){
+    state.moduleDone[key] = true; saveState();
+    return `<h2>✅ ${title} — Selesai!</h2><p class="muted">Tahniah! Anda telah menguasai bahagian ini.</p><button class="btn btn-primary" onclick="goTo('moduleMenu')">Kembali ke Peta Modul →</button>`;
+  }
+  const q = questions[i];
+  return `
+    <div class="topbar"><button class="back" onclick="goTo('moduleMenu')">← Peta Modul</button></div>
+    <h3>${title}</h3>
+    <div class="progressbar"><div style="width:${(i/questions.length)*100}%"></div></div>
+    <div class="card">
+      <p style="font-weight:600;">${q.stem}</p>
+      <div>${q.options.map((o,idx)=>`<button class="btn-option" id="opt-${q.id}-${idx}" onclick="answerModule('${key}', '${q.id}', ${idx})">${o}</button>`).join("")}</div>
+      <div id="fb-${q.id}"></div>
+    </div>
+  `;
+}
+function answerModule(key, qid, idx){
+  const questions = getModuleData(key);
+  const q = questions.find(x=>x.id===qid);
+  if(!q || q._answered) return;
+  q._answered = true;
+  const correct = idx === q.correct;
+  q.options.forEach((o,oi)=>{
+    const btn = document.getElementById(`opt-${qid}-${oi}`);
+    btn.classList.add("disabled");
+    if(oi===q.correct) btn.classList.add("correct");
+    else if(oi===idx) btn.classList.add("wrong");
+  });
+  const fb = document.getElementById(`fb-${qid}`);
+  fb.className = "feedback " + (correct ? "ok" : "no");
+  fb.innerHTML = (correct ? "✅ Betul! " : "❌ Belum tepat. ") + q.explain;
+  fb.insertAdjacentHTML("afterend", `<button class="btn btn-primary" onclick="advanceModule('${key}')">Seterusnya →</button>`);
+  logAnswer(state.practiceLog, { id:q.id, module:key, question:q.stem, chosen:q.options[idx], correctAns:q.options[q.correct], correct, level:"Latihan Berpandu" });
+}
+function advanceModule(key){ getModuleData(key).forEach(q=>{ q._answered=false; }); state.qIndex++; saveState(); render(); }
+
+/* ---------- BANK SOALAN ---------- */
+function screenBankIntro(){
+  return `
+    <h2>🏆 Bank Soalan 4 Aras</h2>
+    <div class="card">
+      <p>8 soalan merentasi 4 aras kesukaran:</p>
+      <div class="databox"><span class="badge-level lvl-rendah">RENDAH</span> Ingat & kenal pasti fakta asas</div>
+      <div class="databox"><span class="badge-level lvl-sederhana">SEDERHANA</span> Aplikasi prosedur biasa</div>
+      <div class="databox"><span class="badge-level lvl-tinggi">TINGGI</span> Analisis & multi-langkah</div>
+      <div class="databox"><span class="badge-level lvl-kbat">KBAT</span> Penaakulan & konteks sebenar</div>
+      <p class="muted" style="margin-bottom:0;">Jika tersilap pada aras Tinggi/KBAT, petunjuk akan diberikan.</p>
+    </div>
+    <button class="btn btn-primary" onclick="goTo('bank', true)">Mula Bank Soalan →</button>
+  `;
+}
+function screenBank(){
+  const i = state.qIndex;
+  if(i >= bank.length){
+    return `<h2>✅ Bank Soalan Selesai</h2><p class="muted">Bersedia untuk cabaran akhir?</p><button class="btn btn-primary" onclick="goTo('exitTicket', true)">Ke Tiket Keluar →</button>`;
+  }
+  const q = bank[i];
+  const lvlClass = {"Rendah":"lvl-rendah","Sederhana":"lvl-sederhana","Tinggi":"lvl-tinggi","KBAT":"lvl-kbat"}[q.level];
+  return `
+    <div class="topbar"><span class="muted">Soalan ${i+1}/${bank.length}</span></div>
+    <div class="progressbar"><div style="width:${(i/bank.length)*100}%"></div></div>
+    <div class="card">
+      <span class="badge-level ${lvlClass}">${q.level}</span>
+      <p style="font-weight:600;">${q.stem}</p>
+      <div>${q.options.map((o,idx)=>`<button class="btn-option" id="optBank-${idx}" onclick="answerBank(${idx})">${o}</button>`).join("")}</div>
+      <div id="fbBank"></div>
+      <div id="hintBank"></div>
+    </div>
+  `;
+}
+function answerBank(idx){
+  const i = state.qIndex;
+  const q = bank[i];
+  if(q._answered) return;
+  const correct = idx === q.correct;
+  const needsScaffold = !correct && (q.level==="Tinggi" || q.level==="KBAT") && !q._hinted;
+  if(needsScaffold){
+    q._hinted = true; state.hintsUsedTotal++; saveState();
+    document.getElementById("hintBank").innerHTML = `<div class="hint-box">💡 Petunjuk: Tukar persamaan kepada bentuk y=mx+c dahulu untuk kenal pasti kecerunan dan pintasan-y dengan mudah.</div>`;
+    return;
+  }
+  q._answered = true;
+  q.options.forEach((o,oi)=>{
+    const btn = document.getElementById(`optBank-${oi}`);
+    btn.classList.add("disabled");
+    if(oi===q.correct) btn.classList.add("correct");
+    else if(oi===idx) btn.classList.add("wrong");
+  });
+  const fb = document.getElementById("fbBank");
+  fb.className = "feedback " + (correct ? "ok" : "no");
+  fb.innerHTML = (correct ? "✅ Betul! " : "❌ Belum tepat. ") + q.explain;
+  fb.insertAdjacentHTML("afterend", `<button class="btn btn-primary" onclick="advanceBank()">Seterusnya →</button>`);
+  logAnswer(state.bankLog, { id:q.id, question:q.stem, chosen:q.options[idx], correctAns:q.options[q.correct], correct, level:q.level });
+}
+function advanceBank(){ state.qIndex++; saveState(); render(); }
+
+/* ---------- TIKET KELUAR ---------- */
+function screenExit(){
+  const i = state.qIndex;
+  if(i >= exitQ.length){
+    state.endTime = Date.now(); saveState();
+    return `<h2>🎉🎉 SELURUH TINGKATAN 3 SELESAI! 🎉🎉</h2><p class="muted">Tahniah! Anda telah menamatkan pengembaraan Matematik Tingkatan 3. Tekan butang di bawah untuk lihat Ringkasan penuh.</p><button class="btn btn-gold" onclick="goTo('summary')">Lihat Ringkasan →</button>`;
+  }
+  const q = exitQ[i];
+  return `
+    <div class="topbar"><span class="muted">Tiket Keluar ${i+1}/${exitQ.length}</span></div>
+    <div class="progressbar"><div style="width:${(i/exitQ.length)*100}%"></div></div>
+    <div class="card">
+      <p style="font-weight:600;">${q.stem}</p>
+      <div>${q.options.map((o,idx)=>`<button class="btn-option" id="optExit-${idx}" onclick="answerExit(${idx})">${o}</button>`).join("")}</div>
+      <div id="fbExit"></div>
+    </div>
+  `;
+}
+function answerExit(idx){
+  const i = state.qIndex;
+  const q = exitQ[i];
+  if(q._answered) return;
+  q._answered = true;
+  const correct = idx === q.correct;
+  q.options.forEach((o,oi)=>{
+    const btn = document.getElementById(`optExit-${oi}`);
+    btn.classList.add("disabled");
+    if(oi===q.correct) btn.classList.add("correct");
+    else if(oi===idx) btn.classList.add("wrong");
+  });
+  const fb = document.getElementById("fbExit");
+  fb.className = "feedback " + (correct ? "ok" : "no");
+  fb.innerHTML = (correct ? "✅ Betul! " : "❌ Belum tepat. ") + q.explain;
+  fb.insertAdjacentHTML("afterend", `<button class="btn btn-primary" onclick="advanceExit()">Seterusnya →</button>`);
+  logAnswer(state.exitLog, { id:q.id, question:q.stem, chosen:q.options[idx], correctAns:q.options[q.correct], correct, level:"Tiket Keluar" });
+}
+function advanceExit(){ state.qIndex++; saveState(); render(); }
+
+/* ---------- RINGKASAN ---------- */
+function allLogs(){ return [].concat(state.diagLog, state.practiceLog, state.bankLog, state.exitLog); }
+function screenSummary(){
+  const logs = allLogs();
+  const gradedLogs = [].concat(state.practiceLog, state.bankLog, state.exitLog);
+  const totalCorrect = gradedLogs.filter(l=>l.correct).length;
+  const totalQ = gradedLogs.length;
+  const pct = totalQ ? Math.round((totalCorrect/totalQ)*100) : 0;
+  let masteryLabel = "Tahap 1 — Asas";
+  if(pct>=80) masteryLabel = "Tahap 3 — Cemerlang ⭐";
+  else if(pct>=60) masteryLabel = "Tahap 2 — Baik";
+  const durationSec = state.endTime && state.startTime ? Math.round((state.endTime-state.startTime)/1000) : 0;
+  const mins = Math.floor(durationSec/60), secs = durationSec%60;
+  const listItems = logs.map(l=>{
+    return `<div class="scoreitem">
+      <div>${l.level ? `<span class="muted">[${l.level}]</span> ` : ""}${escapeHtml(l.question)}</div>
+      <div>${l.correct ? '<span class="ok-tag">✔ Betul</span>' : '<span class="no-tag">✘ Salah</span>'} — Jawapan anda: <b>${escapeHtml(l.chosen)}</b>${l.correct ? "" : ` | Jawapan betul: <b>${escapeHtml(l.correctAns)}</b>`}</div>
+    </div>`;
+  }).join("");
+  return `
+    <h2>📋 Ringkasan Peta Bintang</h2>
+    <div class="card">
+      <p style="margin-bottom:4px;"><b>Nama:</b> ${escapeHtml(state.name)}</p>
+      <p style="margin-bottom:0;"><b>Kelas:</b> ${escapeHtml(state.kelas)}</p>
+    </div>
+    <div class="statrow">
+      <div class="statbox"><div class="num">${totalCorrect}/${totalQ}</div><div class="lbl">Markah</div></div>
+      <div class="statbox"><div class="num">${pct}%</div><div class="lbl">Peratus</div></div>
+      <div class="statbox"><div class="num">${mins}m ${secs}s</div><div class="lbl">Masa</div></div>
+    </div>
+    <div class="card" style="text-align:center;"><div class="pill" style="font-size:0.85rem;">${masteryLabel}</div></div>
+    <h3>Log Jawapan Terperinci</h3>
+    <div class="scorelist">${listItems}</div>
+    <button class="btn btn-ghost" onclick="goTo('confirmReset')">🔄 Set Semula & Cuba Lagi</button>
+    <p class="footer-note">SK 9.1 Garis Lurus · KSSM Matematik Tingkatan 3 · ${VERSION}<br>Sila tangkap skrin ini untuk dihantar kepada guru.</p>
+  `;
+}
+
+/* ---------- RESET ---------- */
+function screenConfirmReset(){
+  return `
+    <h2>⚠️ Sahkan Set Semula</h2>
+    <div class="card"><p>Tindakan ini akan memadam semua rekod jawapan dan markah anda untuk permulaan baharu. Tindakan ini tidak boleh diundur.</p></div>
+    <button class="btn btn-primary" style="background:var(--negative);" onclick="doReset()">Ya, Padam & Mula Semula</button>
+    <button class="btn btn-ghost" onclick="goBack()">Batal, Kembali</button>
+  `;
+}
+function doReset(){ localStorage.removeItem(STORAGE_KEY); state = freshState(); render(); }
+
+/* ---------- UTIL ---------- */
+function escapeHtml(str){
+  if(str === undefined || str === null) return "";
+  return String(str).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+}
+
+/* ---------- MULA ---------- */
+render();
+</script>
+</body>
+</html>

@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Kompleks Bulatan: Sudut Lilitan & Pusat | SK 6.1 (T3)</title>
+<style>
+  :root{
+    --bg: #0e1a12; --bg-alt: #142819; --surface: #1a3620; --surface-2: #22452a;
+    --border: #345e3a; --text: #eefaef; --muted: #a7cbae;
+    --positive: #4ade80; --positive-dark: #1f7a45;
+    --negative: #f87171; --negative-dark: #a83030;
+    --gold: #f4b942; --radius: 14px; --maxw: 560px;
+  }
+  *{ box-sizing: border-box; }
+  html,body{ margin:0; padding:0; }
+  body{
+    background: radial-gradient(ellipse at top, #1a3818 0%, var(--bg) 55%);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    min-height: 100vh; display:flex; justify-content:center; line-height:1.5;
+  }
+  #app{ width:100%; max-width: var(--maxw); min-height:100vh; padding: 18px 18px 40px; position:relative; }
+  h1,h2,h3{ margin:0 0 8px; font-weight:700; letter-spacing:-0.01em; }
+  h1{ font-size:1.5rem; } h2{ font-size:1.2rem; } h3{ font-size:1.02rem; }
+  p{ margin:0 0 12px; color: var(--text); }
+  .muted{ color: var(--muted); font-size:0.9rem; }
+  .card{ background: var(--surface); border:1px solid var(--border); border-radius: var(--radius); padding:16px; margin-bottom:14px; }
+  .pill{ display:inline-block; padding:3px 10px; border-radius:999px; font-size:0.72rem; font-weight:700; letter-spacing:0.02em; background: var(--surface-2); color: var(--gold); border:1px solid var(--border); }
+  .btn{ display:block; width:100%; padding:14px 16px; border-radius: 12px; border:none; font-size:1rem; font-weight:700; cursor:pointer; margin-top:10px; -webkit-tap-highlight-color: transparent; }
+  .btn:active{ transform: scale(0.98); }
+  .btn-primary{ background: var(--positive); color:#062018; }
+  .btn-ghost{ background: transparent; color: var(--muted); border:1px solid var(--border); }
+  .btn-gold{ background: var(--gold); color:#3a2600; }
+  .btn-option{ display:block; width:100%; text-align:left; background: var(--surface-2); color: var(--text); border:1px solid var(--border); border-radius:12px; padding:13px 14px; margin-top:9px; font-size:0.98rem; cursor:pointer; }
+  .btn-option.correct{ background: var(--positive-dark); border-color: var(--positive); }
+  .btn-option.wrong{ background: var(--negative-dark); border-color: var(--negative); }
+  .btn-option.disabled{ pointer-events:none; opacity:0.85; }
+  input[type=text]{ width:100%; padding:13px 14px; border-radius:12px; border:1px solid var(--border); background: var(--surface-2); color: var(--text); font-size:1rem; margin-bottom:6px; }
+  label{ font-size:0.85rem; color: var(--muted); display:block; margin-bottom:5px; margin-top:10px; }
+  .topbar{ display:flex; align-items:center; justify-content:space-between; margin-bottom:14px; gap:10px; }
+  .topbar .back{ background:none; border:none; color: var(--muted); font-size:0.95rem; cursor:pointer; padding:6px 0; }
+  .progressbar{ width:100%; height:8px; background: var(--surface-2); border-radius:999px; overflow:hidden; margin: 8px 0 16px; }
+  .progressbar > div{ height:100%; background: linear-gradient(90deg, var(--positive), var(--gold)); }
+  .databox{ background: var(--bg-alt); border-left:4px solid var(--gold); border-radius:8px; padding:12px 14px; margin:10px 0; font-size:0.95rem; }
+  .databox.neg{ border-left-color: var(--negative); }
+  .databox.pos{ border-left-color: var(--positive); }
+  .feedback{ border-radius:10px; padding:12px 14px; margin-top:10px; font-size:0.92rem; font-weight:600; }
+  .feedback.ok{ background: rgba(74,222,128,0.15); color: var(--positive); border:1px solid var(--positive); }
+  .feedback.no{ background: rgba(248,113,113,0.15); color: var(--negative); border:1px solid var(--negative); }
+  .hint-box{ background: var(--surface-2); border:1px dashed var(--gold); border-radius:10px; padding:10px 12px; margin-top:8px; font-size:0.88rem; color: var(--gold); }
+  .badge-level{ display:inline-block; font-size:0.68rem; font-weight:800; letter-spacing:0.03em; padding:2px 8px; border-radius:6px; margin-bottom:8px; }
+  .lvl-rendah{ background:#264d3a; color:#7be0a8; }
+  .lvl-sederhana{ background:#2a4763; color:#7fc4f7; }
+  .lvl-tinggi{ background:#5a3a1f; color:#f7b563; }
+  .lvl-kbat{ background:#4a2338; color:#f78fc0; }
+  .statrow{ display:flex; gap:10px; margin-bottom:14px; }
+  .statbox{ flex:1; background: var(--surface); border:1px solid var(--border); border-radius:12px; padding:10px; text-align:center; }
+  .statbox .num{ font-size:1.3rem; font-weight:800; color: var(--gold); }
+  .statbox .lbl{ font-size:0.7rem; color: var(--muted); }
+  .scorelist{ max-height:340px; overflow-y:auto; border:1px solid var(--border); border-radius:12px; }
+  .scoreitem{ padding:10px 12px; border-bottom:1px solid var(--border); font-size:0.85rem; }
+  .scoreitem:last-child{ border-bottom:none; }
+  .scoreitem .ok-tag{ color: var(--positive); font-weight:700; }
+  .scoreitem .no-tag{ color: var(--negative); font-weight:700; }
+  .version-badge{ position:absolute; top:10px; right:10px; font-size:0.62rem; background: var(--surface-2); color: var(--muted); border:1px solid var(--border); padding:3px 7px; border-radius:6px; }
+  .module-row{ display:flex; align-items:center; justify-content:space-between; background: var(--surface); border:1px solid var(--border); border-radius:12px; padding:13px 14px; margin-bottom:10px; cursor:pointer; }
+  .module-row.locked{ opacity:0.45; cursor:not-allowed; }
+  .footer-note{ text-align:center; font-size:0.72rem; color: var(--muted); margin-top:24px; }
+</style>
+</head>
+<body>
+<div id="app"></div>
+<script>
+/* =========================================================
+   KOMPLEKS BULATAN: Sudut pada Lilitan & Sudut Pusat
+   SK 6.1 | KSSM Matematik Tingkatan 3
+   VERSI v1.0
+   ========================================================= */
+const VERSION = "v1.0";
+const STORAGE_KEY = "kompleks_bulatan_sk61_t3_state";
+
+function freshState(){
+  return {
+    path:["welcome"], name:"", kelas:"", startTime:null, endTime:null,
+    diagLog:[], practiceLog:[], bankLog:[], exitLog:[],
+    moduleDone:{ A:false,B:false }, moduleIndex:0, qIndex:0,
+    hintsUsedTotal:0, version: VERSION
+  };
+}
+let state = loadState();
+function loadState(){
+  try{
+    const saved = localStorage.getItem(STORAGE_KEY);
+    if(!saved) return freshState();
+    return Object.assign(freshState(), JSON.parse(saved));
+  }catch(e){ return freshState(); }
+}
+function saveState(){ try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }catch(e){} }
+function goTo(screen, resetSub){ if(resetSub){ state.qIndex=0; } state.path.push(screen); saveState(); render(); }
+function goBack(){ if(state.path.length>1){ state.path.pop(); } saveState(); render(); }
+function currentScreen(){ return state.path[state.path.length-1]; }
+
+/* ---------- DATA SOALAN ---------- */
+
+// Modul A — 6.1.1 Konjektur sudut lilitan & sudut pusat
+const modA = [
+  { id:"A1", stem:"Sudut pada lilitan yang dicangkum oleh lengkok yang SAMA (pada bahagian lilitan yang sama) adalah:", options:["SAMA besar","penggenap","pelengkap","berbeza sentiasa"], correct:0, explain:"Sudut-sudut lilitan yang dicangkum lengkok sama adalah sama besar." },
+  { id:"A2", stem:"Hubungan antara sudut pusat dan sudut lilitan yang dicangkum lengkok yang SAMA ialah:", options:["sudut pusat = 2 × sudut lilitan","sudut pusat = sudut lilitan","sudut pusat = ½ × sudut lilitan","tiada hubungan"], correct:0, explain:"Sudut pusat ialah DUA KALI GANDA sudut lilitan yang dicangkum lengkok sama." },
+  { id:"A3", stem:"Sudut dalam semibulatan (dicangkum oleh diameter) ialah:", options:["90° (sentiasa)","180°","45°","tiada nilai tetap"], correct:0, explain:"Sudut dalam semibulatan sentiasa 90° — kes khas teorem sudut pusat/lilitan." }
+];
+
+// Modul B — 6.1.2 Selesaikan masalah sudut dalam bulatan
+const modB = [
+  { id:"B1", stem:"Sudut pusat yang dicangkum oleh lengkok AB ialah 100°. Cari sudut lilitan yang dicangkum lengkok yang sama.", options:["50°","200°","100°","25°"], correct:0, explain:"Sudut lilitan=½×sudut pusat=½×100°=50°." },
+  { id:"B2", stem:"Sudut lilitan yang dicangkum lengkok PQ ialah 35°. Cari sudut pusat yang dicangkum lengkok yang sama.", options:["70°","17.5°","35°","140°"], correct:0, explain:"Sudut pusat=2×sudut lilitan=2×35°=70°." },
+  { id:"B3", stem:"Segi tiga ABC terletak dalam bulatan dengan AC sebagai diameter. Cari sudut ABC.", options:["90° (sudut dalam semibulatan)","180°","45°","60°"], correct:0, explain:"Sudut dalam semibulatan sentiasa 90°." }
+];
+
+// Bank Soalan 4 Aras
+const bank = [
+  { level:"Rendah", id:"BR1", stem:"Sudut dalam semibulatan ialah:", options:["90°","180°","45°","60°"], correct:0, explain:"Sifat asas." },
+  { level:"Rendah", id:"BR2", stem:"Sudut lilitan dicangkum lengkok sama adalah:", options:["sama besar","berbeza","penggenap","pelengkap"], correct:0, explain:"Sifat asas sudut lilitan." },
+  { level:"Sederhana", id:"BS1", stem:"Sudut pusat=80°. Cari sudut lilitan (lengkok sama).", options:["40°","160°","80°","20°"], correct:0, explain:"½×80°=40°." },
+  { level:"Sederhana", id:"BS2", stem:"Sudut lilitan=55°. Cari sudut pusat (lengkok sama).", options:["110°","27.5°","55°","220°"], correct:0, explain:"2×55°=110°." },
+  { level:"Tinggi", id:"BT1", stem:"Dua sudut lilitan A dan B dicangkum oleh lengkok yang sama. Jika sudut A=(2x+10)° dan sudut B=40°, cari nilai x.", options:["15","10","20","25"], correct:0, explain:"Kerana sama besar: 2x+10=40 → 2x=30 → x=15." },
+  { level:"Tinggi", id:"BT2", stem:"Segi tiga PQR dalam bulatan dengan PR sebagai diameter. Jika sudut P=35°, cari sudut R.", options:["55° (kerana sudut Q=90°, 180−90−35=55)","90°","35°","145°"], correct:0, explain:"Sudut Q=90° (sudut dalam semibulatan). Sudut R=180−90−35=55°." },
+  { level:"KBAT", id:"BK1", stem:"Seorang murid mendakwa: \"Sudut pusat SENTIASA sama dengan sudut lilitan.\" Betulkan kefahaman ini.", options:["Betul, sentiasa sama","Salah — sudut pusat ialah DUA KALI GANDA sudut lilitan (bagi lengkok yang sama), bukan sama besar; hubungan ini adalah teorem sudut pusat dan sudut lilitan", "Betul, kerana kedua-duanya sudut bulatan", "Tidak boleh ditentukan"], correct:1, explain:"Sudut pusat=2×sudut lilitan bagi lengkok sama — bukan sama besar." },
+  { level:"KBAT", id:"BK2", stem:"Dalam sebuah bulatan, sudut pusat yang dicangkum lengkok major ialah 280°. Cari sudut lilitan yang dicangkum oleh lengkok MINOR yang sama (di bahagian bertentangan).", options:["40° (sudut pusat lengkok minor=360−280=80°, sudut lilitan=½×80=40°)","140°","80°","220°"], correct:0, explain:"Sudut pusat lengkok minor=360−280=80°. Sudut lilitan=½×80°=40°." }
+];
+
+// Tiket Keluar
+const exitQ = [
+  { id:"E1", stem:"Sudut dalam semibulatan:", options:["90°","180°","45°","60°"], correct:0, explain:"Sifat asas." },
+  { id:"E2", stem:"Sudut pusat=120°. Cari sudut lilitan (lengkok sama).", options:["60°","240°","120°","30°"], correct:0, explain:"½×120°=60°." },
+  { id:"E3", stem:"Sudut lilitan=25°. Cari sudut pusat (lengkok sama).", options:["50°","12.5°","25°","100°"], correct:0, explain:"2×25°=50°." }
+];
+
+function logAnswer(logArray, record){ logArray.push(record); saveState(); }
+
+/* ---------- RENDER UTAMA ---------- */
+function render(){
+  const app = document.getElementById("app");
+  const screen = currentScreen();
+  let html = "";
+  switch(screen){
+    case "welcome": html = screenWelcome(); break;
+    case "identitas": html = screenIdentitas(); break;
+    case "objektif": html = screenObjektif(); break;
+    case "diagnostic": html = screenDiagnostic(); break;
+    case "notes": html = screenNotes(); break;
+    case "moduleMenu": html = screenModuleMenu(); break;
+    case "moduleA": html = screenModule("A", modA, "6.1.1 Konjektur Sudut Lilitan & Pusat"); break;
+    case "moduleB": html = screenModule("B", modB, "6.1.2 Penyelesaian Masalah"); break;
+    case "bankIntro": html = screenBankIntro(); break;
+    case "bank": html = screenBank(); break;
+    case "exitTicket": html = screenExit(); break;
+    case "summary": html = screenSummary(); break;
+    case "confirmReset": html = screenConfirmReset(); break;
+    default: html = screenWelcome();
+  }
+  app.innerHTML = `<div class="version-badge">🔖 VERSI: ${VERSION}</div>` + html;
+}
+
+/* ---------- WELCOME ---------- */
+function screenWelcome(){
+  return `
+    <div style="padding-top:50px; text-align:center;">
+      <div class="pill">KOMPLEKS BULATAN</div>
+      <h1 style="margin-top:14px;">⭕ Sudut Lilitan & Sudut Pusat</h1>
+      <p class="muted">Standard Kandungan 6.1<br>KSSM Matematik Tingkatan 3</p>
+      <div class="card" style="text-align:left; margin-top:24px;">
+        <h3>Apa yang menanti anda?</h3>
+        <p class="muted" style="margin-bottom:0;">Kuasai hubungan istimewa antara sudut pusat dan sudut lilitan dalam bulatan!</p>
+      </div>
+      <button class="btn btn-primary" onclick="goTo('identitas')">Mula Tugasan →</button>
+    </div>
+  `;
+}
+
+/* ---------- IDENTITAS ---------- */
+function screenIdentitas(){
+  return `
+    <div class="topbar"><button class="back" onclick="goBack()">← Kembali</button></div>
+    <h2>Sebelum bermula...</h2>
+    <p class="muted">Isikan maklumat anda untuk rekod prestasi.</p>
+    <div class="card">
+      <label for="inpName">Nama</label>
+      <input type="text" id="inpName" placeholder="Nama penuh" value="${escapeHtml(state.name)}">
+      <label for="inpKelas">Kelas</label>
+      <input type="text" id="inpKelas" placeholder="Contoh: 3 Cemerlang" value="${escapeHtml(state.kelas)}">
+    </div>
+    <button class="btn btn-primary" onclick="submitIdentitas()">Sedia! Mulakan →</button>
+  `;
+}
+function submitIdentitas(){
+  const n = document.getElementById("inpName").value.trim();
+  const k = document.getElementById("inpKelas").value.trim();
+  if(!n || !k){ alertInline("Sila isikan Nama dan Kelas sebelum meneruskan."); return; }
+  state.name=n; state.kelas=k;
+  if(!state.startTime){ state.startTime = Date.now(); }
+  saveState(); goTo("objektif");
+}
+function alertInline(msg){
+  const card = document.querySelector(".card");
+  let warn = document.getElementById("inlineWarn");
+  if(!warn){ warn=document.createElement("div"); warn.id="inlineWarn"; warn.className="feedback no"; card.appendChild(warn); }
+  warn.textContent = msg;
+}
+
+/* ---------- OBJEKTIF ---------- */
+function screenObjektif(){
+  return `
+    <div class="topbar"><button class="back" onclick="goBack()">← Kembali</button></div>
+    <h2>🎯 Taklimat Misi</h2>
+    <div class="card">
+      <h3>Objektif Pembelajaran</h3>
+      <div class="databox">1. Membuat dan menentusahkan konjektur tentang hubungan sudut-sudut pada lilitan, dan sudut pada lilitan dengan sudut pusat.</div>
+      <div class="databox">2. Menyelesaikan masalah yang melibatkan sudut dalam bulatan.</div>
+    </div>
+    <div class="card">
+      <h3>Kriteria Kejayaan</h3>
+      <p class="muted" style="margin-bottom:0;">Selesaikan sekurang-kurangnya 8 daripada 10 soalan dalam Bank Soalan dengan betul, merangkumi semua aras kesukaran.</p>
+    </div>
+    <button class="btn btn-primary" onclick="goTo('diagnostic')">Mula Semakan Awal →</button>
+  `;
+}
+
+/* ---------- SEMAKAN AWAL ---------- */
+const diagQ = [
+  { id:"DG1", stem:"Sudut dalam semibulatan:", options:["90°","180°","45°","60°"], correct:0 },
+  { id:"DG2", stem:"Sudut lilitan dicangkum lengkok sama:", options:["sama besar","berbeza","penggenap","pelengkap"], correct:0 },
+  { id:"DG3", stem:"Hubungan sudut pusat & sudut lilitan (lengkok sama):", options:["sudut pusat=2×sudut lilitan","sama besar","sudut pusat=½×sudut lilitan","tiada hubungan"], correct:0 }
+];
+function screenDiagnostic(){
+  const i = state.qIndex;
+  if(i >= diagQ.length){
+    return `<h2>✅ Semakan Awal Selesai</h2><p class="muted">Mari kukuhkan kefahaman dengan Nota Lengkap.</p><button class="btn btn-primary" onclick="goTo('notes')">Lihat Nota Lengkap →</button>`;
+  }
+  const q = diagQ[i];
+  return `
+    <div class="topbar"><span class="muted">Semakan Awal ${i+1}/${diagQ.length}</span></div>
+    <div class="progressbar"><div style="width:${(i/diagQ.length)*100}%"></div></div>
+    <div class="card"><h3>${q.stem}</h3><div>${q.options.map((o,idx)=>`<button class="btn-option" onclick="answerDiagnostic(${idx})">${o}</button>`).join("")}</div></div>
+  `;
+}
+function answerDiagnostic(idx){
+  const q = diagQ[state.qIndex];
+  const correct = idx===q.correct;
+  logAnswer(state.diagLog, { id:q.id, question:q.stem, chosen:q.options[idx], correctAns:q.options[q.correct], correct, level:"Diagnostik" });
+  state.qIndex++; saveState(); render();
+}
+
+/* ---------- NOTA LENGKAP ---------- */
+function screenNotes(){
+  return `
+    <div class="topbar"><button class="back" onclick="goBack()">← Kembali</button></div>
+    <h2>📘 Nota Lengkap: Sudut Lilitan & Sudut Pusat</h2>
+    <div class="card">
+      <h3>1. Sifat Sudut Lilitan</h3>
+      <div class="databox pos">Sudut lilitan yang dicangkum lengkok SAMA adalah SAMA besar</div>
+      <div class="databox pos">Sudut dalam semibulatan (dicangkum diameter) sentiasa 90°</div>
+    </div>
+    <div class="card">
+      <h3>2. Hubungan Sudut Pusat & Sudut Lilitan</h3>
+      <div class="databox pos">Sudut pusat = 2 × sudut lilitan (bagi lengkok yang sama)</div>
+      <p><b>Contoh:</b> Sudut pusat=100°. Cari sudut lilitan.</p>
+      <div class="databox">Sudut lilitan=½×100°=50°</div>
+    </div>
+    <div class="card">
+      <h3>3. Penyelesaian Masalah</h3>
+      <p><b>Contoh Lengkap:</b> Segi tiga ABC dalam bulatan dengan AC sebagai diameter. Cari sudut ABC.</p>
+      <div class="databox">Kerana AC diameter, sudut ABC ialah sudut dalam semibulatan = 90°</div>
+      <p class="muted" style="margin-top:8px;"><b>⚠️ Miskonsepsi biasa:</b> "Sudut pusat sentiasa sama dengan sudut lilitan" — INI SALAH. Sudut pusat=DUA KALI sudut lilitan bagi lengkok sama.</p>
+    </div>
+    <div class="card">
+      <h3>📌 Rumusan Pantas</h3>
+      <div class="databox">• Sudut lilitan (lengkok sama): sama besar</div>
+      <div class="databox">• Sudut pusat = 2 × sudut lilitan</div>
+      <div class="databox">• Sudut dalam semibulatan = 90°</div>
+    </div>
+    <button class="btn btn-primary" onclick="goTo('moduleMenu')">Faham, Sedia untuk Latihan →</button>
+  `;
+}
+
+/* ---------- MENU MODUL ---------- */
+function screenModuleMenu(){
+  const items = [
+    {key:"A", label:"Modul A · Konjektur Sudut Lilitan & Pusat", sp:"6.1.1", screen:"moduleA"},
+    {key:"B", label:"Modul B · Penyelesaian Masalah", sp:"6.1.2", screen:"moduleB"}
+  ];
+  const doneCount = Object.values(state.moduleDone).filter(Boolean).length;
+  const rows = items.map((it, idx)=>{
+    const done = state.moduleDone[it.key];
+    const prevDone = idx===0 ? true : state.moduleDone[items[idx-1].key];
+    const locked = !prevDone && !done;
+    return `<div class="module-row ${locked?'locked':''}" onclick="${locked? '': `openModule('${it.screen}')`}">
+      <div><div style="font-weight:700;">${it.label}</div><div class="muted" style="font-size:0.78rem;">SP ${it.sp}</div></div>
+      <div>${done ? "✅" : (locked ? "🔒" : "▶️")}</div>
+    </div>`;
+  }).join("");
+  return `
+    <div class="topbar"><span class="muted">Latihan Berpandu</span></div>
+    <h2>🧭 Peta Modul</h2>
+    <div class="progressbar"><div style="width:${(doneCount/2)*100}%"></div></div>
+    ${rows}
+    ${doneCount===2 ? `<button class="btn btn-primary" onclick="goTo('bankIntro')">Semua Modul Selesai — Teruskan →</button>` : `<p class="muted" style="text-align:center;">Selesaikan semua modul untuk buka Bank Soalan.</p>`}
+  `;
+}
+function openModule(screen){ state.qIndex=0; goTo(screen); }
+
+/* ---------- MODUL GENERIK ---------- */
+function getModuleData(key){
+  if(key==="A") return modA;
+  if(key==="B") return modB;
+  return [];
+}
+function screenModule(key, questions, title){
+  const i = state.qIndex;
+  if(i >= questions.length){
+    state.moduleDone[key] = true; saveState();
+    return `<h2>✅ ${title} — Selesai!</h2><p class="muted">Tahniah! Anda telah menguasai bahagian ini.</p><button class="btn btn-primary" onclick="goTo('moduleMenu')">Kembali ke Peta Modul →</button>`;
+  }
+  const q = questions[i];
+  return `
+    <div class="topbar"><button class="back" onclick="goTo('moduleMenu')">← Peta Modul</button></div>
+    <h3>${title}</h3>
+    <div class="progressbar"><div style="width:${(i/questions.length)*100}%"></div></div>
+    <div class="card">
+      <p style="font-weight:600;">${q.stem}</p>
+      <div>${q.options.map((o,idx)=>`<button class="btn-option" id="opt-${q.id}-${idx}" onclick="answerModule('${key}', '${q.id}', ${idx})">${o}</button>`).join("")}</div>
+      <div id="fb-${q.id}"></div>
+    </div>
+  `;
+}
+function answerModule(key, qid, idx){
+  const questions = getModuleData(key);
+  const q = questions.find(x=>x.id===qid);
+  if(!q || q._answered) return;
+  q._answered = true;
+  const correct = idx === q.correct;
+  q.options.forEach((o,oi)=>{
+    const btn = document.getElementById(`opt-${qid}-${oi}`);
+    btn.classList.add("disabled");
+    if(oi===q.correct) btn.classList.add("correct");
+    else if(oi===idx) btn.classList.add("wrong");
+  });
+  const fb = document.getElementById(`fb-${qid}`);
+  fb.className = "feedback " + (correct ? "ok" : "no");
+  fb.innerHTML = (correct ? "✅ Betul! " : "❌ Belum tepat. ") + q.explain;
+  fb.insertAdjacentHTML("afterend", `<button class="btn btn-primary" onclick="advanceModule('${key}')">Seterusnya →</button>`);
+  logAnswer(state.practiceLog, { id:q.id, module:key, question:q.stem, chosen:q.options[idx], correctAns:q.options[q.correct], correct, level:"Latihan Berpandu" });
+}
+function advanceModule(key){ getModuleData(key).forEach(q=>{ q._answered=false; }); state.qIndex++; saveState(); render(); }
+
+/* ---------- BANK SOALAN ---------- */
+function screenBankIntro(){
+  return `
+    <h2>🏆 Bank Soalan 4 Aras</h2>
+    <div class="card">
+      <p>8 soalan merentasi 4 aras kesukaran:</p>
+      <div class="databox"><span class="badge-level lvl-rendah">RENDAH</span> Ingat & kenal pasti fakta asas</div>
+      <div class="databox"><span class="badge-level lvl-sederhana">SEDERHANA</span> Aplikasi prosedur biasa</div>
+      <div class="databox"><span class="badge-level lvl-tinggi">TINGGI</span> Analisis & multi-langkah</div>
+      <div class="databox"><span class="badge-level lvl-kbat">KBAT</span> Penaakulan & konteks sebenar</div>
+      <p class="muted" style="margin-bottom:0;">Jika tersilap pada aras Tinggi/KBAT, petunjuk akan diberikan.</p>
+    </div>
+    <button class="btn btn-primary" onclick="goTo('bank', true)">Mula Bank Soalan →</button>
+  `;
+}
+function screenBank(){
+  const i = state.qIndex;
+  if(i >= bank.length){
+    return `<h2>✅ Bank Soalan Selesai</h2><p class="muted">Bersedia untuk cabaran akhir?</p><button class="btn btn-primary" onclick="goTo('exitTicket', true)">Ke Tiket Keluar →</button>`;
+  }
+  const q = bank[i];
+  const lvlClass = {"Rendah":"lvl-rendah","Sederhana":"lvl-sederhana","Tinggi":"lvl-tinggi","KBAT":"lvl-kbat"}[q.level];
+  return `
+    <div class="topbar"><span class="muted">Soalan ${i+1}/${bank.length}</span></div>
+    <div class="progressbar"><div style="width:${(i/bank.length)*100}%"></div></div>
+    <div class="card">
+      <span class="badge-level ${lvlClass}">${q.level}</span>
+      <p style="font-weight:600;">${q.stem}</p>
+      <div>${q.options.map((o,idx)=>`<button class="btn-option" id="optBank-${idx}" onclick="answerBank(${idx})">${o}</button>`).join("")}</div>
+      <div id="fbBank"></div>
+      <div id="hintBank"></div>
+    </div>
+  `;
+}
+function answerBank(idx){
+  const i = state.qIndex;
+  const q = bank[i];
+  if(q._answered) return;
+  const correct = idx === q.correct;
+  const needsScaffold = !correct && (q.level==="Tinggi" || q.level==="KBAT") && !q._hinted;
+  if(needsScaffold){
+    q._hinted = true; state.hintsUsedTotal++; saveState();
+    document.getElementById("hintBank").innerHTML = `<div class="hint-box">💡 Petunjuk: Kenal pasti sama ada lengkok yang dicangkum sama, dan gunakan hubungan sudut pusat=2×sudut lilitan.</div>`;
+    return;
+  }
+  q._answered = true;
+  q.options.forEach((o,oi)=>{
+    const btn = document.getElementById(`optBank-${oi}`);
+    btn.classList.add("disabled");
+    if(oi===q.correct) btn.classList.add("correct");
+    else if(oi===idx) btn.classList.add("wrong");
+  });
+  const fb = document.getElementById("fbBank");
+  fb.className = "feedback " + (correct ? "ok" : "no");
+  fb.innerHTML = (correct ? "✅ Betul! " : "❌ Belum tepat. ") + q.explain;
+  fb.insertAdjacentHTML("afterend", `<button class="btn btn-primary" onclick="advanceBank()">Seterusnya →</button>`);
+  logAnswer(state.bankLog, { id:q.id, question:q.stem, chosen:q.options[idx], correctAns:q.options[q.correct], correct, level:q.level });
+}
+function advanceBank(){ state.qIndex++; saveState(); render(); }
+
+/* ---------- TIKET KELUAR ---------- */
+function screenExit(){
+  const i = state.qIndex;
+  if(i >= exitQ.length){
+    state.endTime = Date.now(); saveState();
+    return `<h2>🎉 Tugasan Kompleks Bulatan Selesai!</h2><p class="muted">Tekan butang di bawah untuk lihat Ringkasan penuh.</p><button class="btn btn-gold" onclick="goTo('summary')">Lihat Ringkasan →</button>`;
+  }
+  const q = exitQ[i];
+  return `
+    <div class="topbar"><span class="muted">Tiket Keluar ${i+1}/${exitQ.length}</span></div>
+    <div class="progressbar"><div style="width:${(i/exitQ.length)*100}%"></div></div>
+    <div class="card">
+      <p style="font-weight:600;">${q.stem}</p>
+      <div>${q.options.map((o,idx)=>`<button class="btn-option" id="optExit-${idx}" onclick="answerExit(${idx})">${o}</button>`).join("")}</div>
+      <div id="fbExit"></div>
+    </div>
+  `;
+}
+function answerExit(idx){
+  const i = state.qIndex;
+  const q = exitQ[i];
+  if(q._answered) return;
+  q._answered = true;
+  const correct = idx === q.correct;
+  q.options.forEach((o,oi)=>{
+    const btn = document.getElementById(`optExit-${oi}`);
+    btn.classList.add("disabled");
+    if(oi===q.correct) btn.classList.add("correct");
+    else if(oi===idx) btn.classList.add("wrong");
+  });
+  const fb = document.getElementById("fbExit");
+  fb.className = "feedback " + (correct ? "ok" : "no");
+  fb.innerHTML = (correct ? "✅ Betul! " : "❌ Belum tepat. ") + q.explain;
+  fb.insertAdjacentHTML("afterend", `<button class="btn btn-primary" onclick="advanceExit()">Seterusnya →</button>`);
+  logAnswer(state.exitLog, { id:q.id, question:q.stem, chosen:q.options[idx], correctAns:q.options[q.correct], correct, level:"Tiket Keluar" });
+}
+function advanceExit(){ state.qIndex++; saveState(); render(); }
+
+/* ---------- RINGKASAN ---------- */
+function allLogs(){ return [].concat(state.diagLog, state.practiceLog, state.bankLog, state.exitLog); }
+function screenSummary(){
+  const logs = allLogs();
+  const gradedLogs = [].concat(state.practiceLog, state.bankLog, state.exitLog);
+  const totalCorrect = gradedLogs.filter(l=>l.correct).length;
+  const totalQ = gradedLogs.length;
+  const pct = totalQ ? Math.round((totalCorrect/totalQ)*100) : 0;
+  let masteryLabel = "Tahap 1 — Asas";
+  if(pct>=80) masteryLabel = "Tahap 3 — Cemerlang ⭕";
+  else if(pct>=60) masteryLabel = "Tahap 2 — Baik";
+  const durationSec = state.endTime && state.startTime ? Math.round((state.endTime-state.startTime)/1000) : 0;
+  const mins = Math.floor(durationSec/60), secs = durationSec%60;
+  const listItems = logs.map(l=>{
+    return `<div class="scoreitem">
+      <div>${l.level ? `<span class="muted">[${l.level}]</span> ` : ""}${escapeHtml(l.question)}</div>
+      <div>${l.correct ? '<span class="ok-tag">✔ Betul</span>' : '<span class="no-tag">✘ Salah</span>'} — Jawapan anda: <b>${escapeHtml(l.chosen)}</b>${l.correct ? "" : ` | Jawapan betul: <b>${escapeHtml(l.correctAns)}</b>`}</div>
+    </div>`;
+  }).join("");
+  return `
+    <h2>📋 Ringkasan Kompleks Bulatan</h2>
+    <div class="card">
+      <p style="margin-bottom:4px;"><b>Nama:</b> ${escapeHtml(state.name)}</p>
+      <p style="margin-bottom:0;"><b>Kelas:</b> ${escapeHtml(state.kelas)}</p>
+    </div>
+    <div class="statrow">
+      <div class="statbox"><div class="num">${totalCorrect}/${totalQ}</div><div class="lbl">Markah</div></div>
+      <div class="statbox"><div class="num">${pct}%</div><div class="lbl">Peratus</div></div>
+      <div class="statbox"><div class="num">${mins}m ${secs}s</div><div class="lbl">Masa</div></div>
+    </div>
+    <div class="card" style="text-align:center;"><div class="pill" style="font-size:0.85rem;">${masteryLabel}</div></div>
+    <h3>Log Jawapan Terperinci</h3>
+    <div class="scorelist">${listItems}</div>
+    <button class="btn btn-ghost" onclick="goTo('confirmReset')">🔄 Set Semula & Cuba Lagi</button>
+    <p class="footer-note">SK 6.1 Sudut Lilitan & Sudut Pusat · KSSM Matematik Tingkatan 3 · ${VERSION}<br>Sila tangkap skrin ini untuk dihantar kepada guru.</p>
+  `;
+}
+
+/* ---------- RESET ---------- */
+function screenConfirmReset(){
+  return `
+    <h2>⚠️ Sahkan Set Semula</h2>
+    <div class="card"><p>Tindakan ini akan memadam semua rekod jawapan dan markah anda untuk permulaan baharu. Tindakan ini tidak boleh diundur.</p></div>
+    <button class="btn btn-primary" style="background:var(--negative);" onclick="doReset()">Ya, Padam & Mula Semula</button>
+    <button class="btn btn-ghost" onclick="goBack()">Batal, Kembali</button>
+  `;
+}
+function doReset(){ localStorage.removeItem(STORAGE_KEY); state = freshState(); render(); }
+
+/* ---------- UTIL ---------- */
+function escapeHtml(str){
+  if(str === undefined || str === null) return "";
+  return String(str).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+}
+
+/* ---------- MULA ---------- */
+render();
+</script>
+</body>
+</html>

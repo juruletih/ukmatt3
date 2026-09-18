@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Bilik Lukisan: Pelan & Dongakan | SK 7.2 (T3)</title>
+<style>
+  :root{
+    --bg: #0e1a12; --bg-alt: #142819; --surface: #1a3620; --surface-2: #22452a;
+    --border: #345e3a; --text: #eefaef; --muted: #a7cbae;
+    --positive: #4ade80; --positive-dark: #1f7a45;
+    --negative: #f87171; --negative-dark: #a83030;
+    --gold: #f4b942; --radius: 14px; --maxw: 560px;
+  }
+  *{ box-sizing: border-box; }
+  html,body{ margin:0; padding:0; }
+  body{
+    background: radial-gradient(ellipse at top, #1a3818 0%, var(--bg) 55%);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    min-height: 100vh; display:flex; justify-content:center; line-height:1.5;
+  }
+  #app{ width:100%; max-width: var(--maxw); min-height:100vh; padding: 18px 18px 40px; position:relative; }
+  h1,h2,h3{ margin:0 0 8px; font-weight:700; letter-spacing:-0.01em; }
+  h1{ font-size:1.5rem; } h2{ font-size:1.2rem; } h3{ font-size:1.02rem; }
+  p{ margin:0 0 12px; color: var(--text); }
+  .muted{ color: var(--muted); font-size:0.9rem; }
+  .card{ background: var(--surface); border:1px solid var(--border); border-radius: var(--radius); padding:16px; margin-bottom:14px; }
+  .pill{ display:inline-block; padding:3px 10px; border-radius:999px; font-size:0.72rem; font-weight:700; letter-spacing:0.02em; background: var(--surface-2); color: var(--gold); border:1px solid var(--border); }
+  .btn{ display:block; width:100%; padding:14px 16px; border-radius: 12px; border:none; font-size:1rem; font-weight:700; cursor:pointer; margin-top:10px; -webkit-tap-highlight-color: transparent; }
+  .btn:active{ transform: scale(0.98); }
+  .btn-primary{ background: var(--positive); color:#062018; }
+  .btn-ghost{ background: transparent; color: var(--muted); border:1px solid var(--border); }
+  .btn-gold{ background: var(--gold); color:#3a2600; }
+  .btn-option{ display:block; width:100%; text-align:left; background: var(--surface-2); color: var(--text); border:1px solid var(--border); border-radius:12px; padding:13px 14px; margin-top:9px; font-size:0.98rem; cursor:pointer; }
+  .btn-option.correct{ background: var(--positive-dark); border-color: var(--positive); }
+  .btn-option.wrong{ background: var(--negative-dark); border-color: var(--negative); }
+  .btn-option.disabled{ pointer-events:none; opacity:0.85; }
+  input[type=text]{ width:100%; padding:13px 14px; border-radius:12px; border:1px solid var(--border); background: var(--surface-2); color: var(--text); font-size:1rem; margin-bottom:6px; }
+  label{ font-size:0.85rem; color: var(--muted); display:block; margin-bottom:5px; margin-top:10px; }
+  .topbar{ display:flex; align-items:center; justify-content:space-between; margin-bottom:14px; gap:10px; }
+  .topbar .back{ background:none; border:none; color: var(--muted); font-size:0.95rem; cursor:pointer; padding:6px 0; }
+  .progressbar{ width:100%; height:8px; background: var(--surface-2); border-radius:999px; overflow:hidden; margin: 8px 0 16px; }
+  .progressbar > div{ height:100%; background: linear-gradient(90deg, var(--positive), var(--gold)); }
+  .databox{ background: var(--bg-alt); border-left:4px solid var(--gold); border-radius:8px; padding:12px 14px; margin:10px 0; font-size:0.95rem; }
+  .databox.neg{ border-left-color: var(--negative); }
+  .databox.pos{ border-left-color: var(--positive); }
+  .feedback{ border-radius:10px; padding:12px 14px; margin-top:10px; font-size:0.92rem; font-weight:600; }
+  .feedback.ok{ background: rgba(74,222,128,0.15); color: var(--positive); border:1px solid var(--positive); }
+  .feedback.no{ background: rgba(248,113,113,0.15); color: var(--negative); border:1px solid var(--negative); }
+  .hint-box{ background: var(--surface-2); border:1px dashed var(--gold); border-radius:10px; padding:10px 12px; margin-top:8px; font-size:0.88rem; color: var(--gold); }
+  .badge-level{ display:inline-block; font-size:0.68rem; font-weight:800; letter-spacing:0.03em; padding:2px 8px; border-radius:6px; margin-bottom:8px; }
+  .lvl-rendah{ background:#264d3a; color:#7be0a8; }
+  .lvl-sederhana{ background:#2a4763; color:#7fc4f7; }
+  .lvl-tinggi{ background:#5a3a1f; color:#f7b563; }
+  .lvl-kbat{ background:#4a2338; color:#f78fc0; }
+  .statrow{ display:flex; gap:10px; margin-bottom:14px; }
+  .statbox{ flex:1; background: var(--surface); border:1px solid var(--border); border-radius:12px; padding:10px; text-align:center; }
+  .statbox .num{ font-size:1.3rem; font-weight:800; color: var(--gold); }
+  .statbox .lbl{ font-size:0.7rem; color: var(--muted); }
+  .scorelist{ max-height:340px; overflow-y:auto; border:1px solid var(--border); border-radius:12px; }
+  .scoreitem{ padding:10px 12px; border-bottom:1px solid var(--border); font-size:0.85rem; }
+  .scoreitem:last-child{ border-bottom:none; }
+  .scoreitem .ok-tag{ color: var(--positive); font-weight:700; }
+  .scoreitem .no-tag{ color: var(--negative); font-weight:700; }
+  .version-badge{ position:absolute; top:10px; right:10px; font-size:0.62rem; background: var(--surface-2); color: var(--muted); border:1px solid var(--border); padding:3px 7px; border-radius:6px; }
+  .module-row{ display:flex; align-items:center; justify-content:space-between; background: var(--surface); border:1px solid var(--border); border-radius:12px; padding:13px 14px; margin-bottom:10px; cursor:pointer; }
+  .module-row.locked{ opacity:0.45; cursor:not-allowed; }
+  .footer-note{ text-align:center; font-size:0.72rem; color: var(--muted); margin-top:24px; }
+</style>
+</head>
+<body>
+<div id="app"></div>
+<script>
+/* =========================================================
+   BILIK LUKISAN: Pelan & Dongakan
+   SK 7.2 | KSSM Matematik Tingkatan 3
+   VERSI v1.0
+   ========================================================= */
+const VERSION = "v1.0";
+const STORAGE_KEY = "bilik_lukisan_sk72_t3_state";
+
+function freshState(){
+  return {
+    path:["welcome"], name:"", kelas:"", startTime:null, endTime:null,
+    diagLog:[], practiceLog:[], bankLog:[], exitLog:[],
+    moduleDone:{ A:false,B:false,C:false }, moduleIndex:0, qIndex:0,
+    hintsUsedTotal:0, version: VERSION
+  };
+}
+let state = loadState();
+function loadState(){
+  try{
+    const saved = localStorage.getItem(STORAGE_KEY);
+    if(!saved) return freshState();
+    return Object.assign(freshState(), JSON.parse(saved));
+  }catch(e){ return freshState(); }
+}
+function saveState(){ try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }catch(e){} }
+function goTo(screen, resetSub){ if(resetSub){ state.qIndex=0; } state.path.push(screen); saveState(); render(); }
+function goBack(){ if(state.path.length>1){ state.path.pop(); } saveState(); render(); }
+function currentScreen(){ return state.path[state.path.length-1]; }
+
+/* ---------- DATA SOALAN ---------- */
+
+// Modul A — 7.2.1 Lukis pelan & dongakan mengikut skala
+const modA = [
+  { id:"A1", stem:"Pelan ialah unjuran ortogon dilihat dari:", options:["atas (pandangan mengufuk)","hadapan","sisi","pepenjuru"], correct:0, explain:"Pelan = pandangan dari atas." },
+  { id:"A2", stem:"Dongakan ialah unjuran ortogon dilihat dari:", options:["hadapan atau sisi (pandangan mencancang)","atas sahaja","bawah sahaja","pepenjuru"], correct:0, explain:"Dongakan = pandangan dari hadapan/sisi." },
+  { id:"A3", stem:"Dalam pelan dan dongakan, garis SEMPANG digunakan untuk mewakili:", options:["sisi TERLINDUNG (tidak nampak)","sisi yang nampak","garis binaan","tiada makna khusus"], correct:0, explain:"Garis sempang = sisi tersembunyi." }
+];
+
+// Modul B — 7.2.2 Sintesis pelan & dongakan, lakar objek
+const modB = [
+  { id:"B1", stem:"Garis PADU TEBAL dalam lukisan pelan/dongakan mewakili:", options:["sisi yang NAMPAK","sisi terlindung","garis binaan sahaja","sempadan luar semata-mata"], correct:0, explain:"Garis padu tebal = sisi nampak." },
+  { id:"B2", stem:"Mensintesis pelan dan dongakan bermaksud:", options:["menggabungkan maklumat pelan & dongakan untuk membentuk semula gambaran objek 3D","melukis pelan sahaja","melukis dongakan sahaja","mengabaikan salah satu pandangan"], correct:0, explain:"Sintesis = gabungkan maklumat untuk bentuk 3D." }
+];
+
+// Modul C — 7.2.3 Selesaikan masalah pelan & dongakan
+const modC = [
+  { id:"C1", stem:"Sebuah pelan menunjukkan segi empat tepat 6cm×4cm, dan dongakan hadapan menunjukkan segi empat tepat 6cm×3cm. Apakah kemungkinan bentuk objek 3D tersebut?", options:["kuboid dengan panjang 6cm, lebar 4cm, tinggi 3cm","kubus","silinder","kon"], correct:0, explain:"Gabungan pelan & dongakan segi empat tepat menunjukkan kuboid." },
+  { id:"C2", stem:"Sebuah objek mempunyai pelan berbentuk bulatan dan dongakan berbentuk segi empat tepat. Objek ini kemungkinan besar ialah:", options:["silinder (tabung)","kubus","kon","piramid"], correct:0, explain:"Bulatan (atas) + segi empat tepat (sisi) = silinder." }
+];
+
+// Bank Soalan 4 Aras
+const bank = [
+  { level:"Rendah", id:"BR1", stem:"Pelan ialah unjuran dilihat dari:", options:["atas","hadapan","sisi","pepenjuru"], correct:0, explain:"Definisi pelan." },
+  { level:"Rendah", id:"BR2", stem:"Garis padu tebal mewakili sisi yang:", options:["nampak","terlindung","binaan","tiada makna"], correct:0, explain:"Definisi garis padu tebal." },
+  { level:"Sederhana", id:"BS1", stem:"Dongakan ialah unjuran dilihat dari:", options:["hadapan/sisi","atas sahaja","bawah","pepenjuru"], correct:0, explain:"Definisi dongakan." },
+  { level:"Sederhana", id:"BS2", stem:"Garis sempang mewakili sisi yang:", options:["terlindung","nampak","binaan","sempadan luar"], correct:0, explain:"Definisi garis sempang." },
+  { level:"Tinggi", id:"BT1", stem:"Pelan objek berbentuk segi empat sama 5cm×5cm, dongakan hadapan berbentuk segi empat sama 5cm×5cm. Objek ini kemungkinan besar:", options:["kubus","silinder","kon","piramid sahaja"], correct:0, explain:"Segi empat sama pada kedua-dua pandangan menunjukkan kubus." },
+  { level:"Tinggi", id:"BT2", stem:"Pelan objek berbentuk bulatan dan dongakan berbentuk segi tiga. Objek ini kemungkinan besar:", options:["kon","silinder","kubus","kuboid"], correct:0, explain:"Bulatan (atas) + segi tiga (sisi) = kon." },
+  { level:"KBAT", id:"BK1", stem:"Seorang murid mendakwa: \"Pelan sahaja mencukupi untuk menentukan bentuk 3D sesuatu objek.\" Betulkan kefahaman ini.", options:["Betul, pelan sahaja mencukupi","Salah — pelan sahaja tidak mencukupi kerana objek berbeza (contoh silinder dan kubus dengan tapak sama) boleh mempunyai PELAN yang SAMA tetapi DONGAKAN yang berbeza; perlu gabungan pelan DAN dongakan untuk tentukan bentuk sepenuhnya","Betul, kerana pelan menunjukkan semua maklumat","Tidak boleh ditentukan"], correct:1, explain:"Pelan dan dongakan perlu digunakan BERSAMA untuk menentukan bentuk 3D dengan pasti." },
+  { level:"KBAT", id:"BK2", stem:"Sebuah objek gabungan terdiri daripada kuboid dengan piramid di atasnya (seperti rumah). Pelan objek ini akan menunjukkan:", options:["garis padu tebal untuk sempadan kuboid, dengan mungkin garis tambahan untuk piramid bergantung sudut pandangan","hanya bulatan","hanya segi tiga","tiada garis langsung"], correct:0, explain:"Objek gabungan memberi pelan gabungan garis daripada kedua-dua komponen." }
+];
+
+// Tiket Keluar
+const exitQ = [
+  { id:"E1", stem:"Pelan dilihat dari:", options:["atas","hadapan","sisi","pepenjuru"], correct:0, explain:"Definisi pelan." },
+  { id:"E2", stem:"Dongakan dilihat dari:", options:["hadapan/sisi","atas sahaja","bawah","pepenjuru"], correct:0, explain:"Definisi dongakan." },
+  { id:"E3", stem:"Garis padu tebal mewakili sisi:", options:["nampak","terlindung","binaan","tiada makna"], correct:0, explain:"Definisi garis padu tebal." }
+];
+
+function logAnswer(logArray, record){ logArray.push(record); saveState(); }
+
+/* ---------- RENDER UTAMA ---------- */
+function render(){
+  const app = document.getElementById("app");
+  const screen = currentScreen();
+  let html = "";
+  switch(screen){
+    case "welcome": html = screenWelcome(); break;
+    case "identitas": html = screenIdentitas(); break;
+    case "objektif": html = screenObjektif(); break;
+    case "diagnostic": html = screenDiagnostic(); break;
+    case "notes": html = screenNotes(); break;
+    case "moduleMenu": html = screenModuleMenu(); break;
+    case "moduleA": html = screenModule("A", modA, "7.2.1 Lukis Pelan & Dongakan"); break;
+    case "moduleB": html = screenModule("B", modB, "7.2.2 Sintesis & Lakar"); break;
+    case "moduleC": html = screenModule("C", modC, "7.2.3 Penyelesaian Masalah"); break;
+    case "bankIntro": html = screenBankIntro(); break;
+    case "bank": html = screenBank(); break;
+    case "exitTicket": html = screenExit(); break;
+    case "summary": html = screenSummary(); break;
+    case "confirmReset": html = screenConfirmReset(); break;
+    default: html = screenWelcome();
+  }
+  app.innerHTML = `<div class="version-badge">🔖 VERSI: ${VERSION}</div>` + html;
+}
+
+/* ---------- WELCOME ---------- */
+function screenWelcome(){
+  return `
+    <div style="padding-top:50px; text-align:center;">
+      <div class="pill">BILIK LUKISAN</div>
+      <h1 style="margin-top:14px;">📐 Pelan & Dongakan</h1>
+      <p class="muted">Standard Kandungan 7.2<br>KSSM Matematik Tingkatan 3</p>
+      <div class="card" style="text-align:left; margin-top:24px;">
+        <h3>Apa yang menanti anda?</h3>
+        <p class="muted" style="margin-bottom:0;">Sebagai jurutera bangunan, anda perlu melukis dan mentafsir pelan serta dongakan untuk membina model bangunan yang tepat!</p>
+      </div>
+      <button class="btn btn-primary" onclick="goTo('identitas')">Mula Tugasan →</button>
+    </div>
+  `;
+}
+
+/* ---------- IDENTITAS ---------- */
+function screenIdentitas(){
+  return `
+    <div class="topbar"><button class="back" onclick="goBack()">← Kembali</button></div>
+    <h2>Sebelum bermula...</h2>
+    <p class="muted">Isikan maklumat anda untuk rekod prestasi.</p>
+    <div class="card">
+      <label for="inpName">Nama</label>
+      <input type="text" id="inpName" placeholder="Nama penuh" value="${escapeHtml(state.name)}">
+      <label for="inpKelas">Kelas</label>
+      <input type="text" id="inpKelas" placeholder="Contoh: 3 Cemerlang" value="${escapeHtml(state.kelas)}">
+    </div>
+    <button class="btn btn-primary" onclick="submitIdentitas()">Sedia! Mulakan →</button>
+  `;
+}
+function submitIdentitas(){
+  const n = document.getElementById("inpName").value.trim();
+  const k = document.getElementById("inpKelas").value.trim();
+  if(!n || !k){ alertInline("Sila isikan Nama dan Kelas sebelum meneruskan."); return; }
+  state.name=n; state.kelas=k;
+  if(!state.startTime){ state.startTime = Date.now(); }
+  saveState(); goTo("objektif");
+}
+function alertInline(msg){
+  const card = document.querySelector(".card");
+  let warn = document.getElementById("inlineWarn");
+  if(!warn){ warn=document.createElement("div"); warn.id="inlineWarn"; warn.className="feedback no"; card.appendChild(warn); }
+  warn.textContent = msg;
+}
+
+/* ---------- OBJEKTIF ---------- */
+function screenObjektif(){
+  return `
+    <div class="topbar"><button class="back" onclick="goBack()">← Kembali</button></div>
+    <h2>🎯 Taklimat Misi</h2>
+    <div class="card">
+      <h3>Objektif Pembelajaran</h3>
+      <div class="databox">1. Melukis pelan dan dongakan suatu objek mengikut skala.</div>
+      <div class="databox">2. Mensintesis pelan dan dongakan suatu objek dan melakar objek tersebut.</div>
+      <div class="databox">3. Menyelesaikan masalah yang melibatkan pelan dan dongakan.</div>
+    </div>
+    <div class="card">
+      <h3>Kriteria Kejayaan</h3>
+      <p class="muted" style="margin-bottom:0;">Selesaikan sekurang-kurangnya 8 daripada 10 soalan dalam Bank Soalan dengan betul, merangkumi semua aras kesukaran.</p>
+    </div>
+    <button class="btn btn-primary" onclick="goTo('diagnostic')">Mula Semakan Awal →</button>
+  `;
+}
+
+/* ---------- SEMAKAN AWAL ---------- */
+const diagQ = [
+  { id:"DG1", stem:"Pelan dilihat dari:", options:["atas","hadapan","sisi","pepenjuru"], correct:0 },
+  { id:"DG2", stem:"Dongakan dilihat dari:", options:["hadapan/sisi","atas","bawah","pepenjuru"], correct:0 },
+  { id:"DG3", stem:"Garis sempang mewakili sisi:", options:["terlindung","nampak","binaan","luar"], correct:0 }
+];
+function screenDiagnostic(){
+  const i = state.qIndex;
+  if(i >= diagQ.length){
+    return `<h2>✅ Semakan Awal Selesai</h2><p class="muted">Mari kukuhkan kefahaman dengan Nota Lengkap.</p><button class="btn btn-primary" onclick="goTo('notes')">Lihat Nota Lengkap →</button>`;
+  }
+  const q = diagQ[i];
+  return `
+    <div class="topbar"><span class="muted">Semakan Awal ${i+1}/${diagQ.length}</span></div>
+    <div class="progressbar"><div style="width:${(i/diagQ.length)*100}%"></div></div>
+    <div class="card"><h3>${q.stem}</h3><div>${q.options.map((o,idx)=>`<button class="btn-option" onclick="answerDiagnostic(${idx})">${o}</button>`).join("")}</div></div>
+  `;
+}
+function answerDiagnostic(idx){
+  const q = diagQ[state.qIndex];
+  const correct = idx===q.correct;
+  logAnswer(state.diagLog, { id:q.id, question:q.stem, chosen:q.options[idx], correctAns:q.options[q.correct], correct, level:"Diagnostik" });
+  state.qIndex++; saveState(); render();
+}
+
+/* ---------- NOTA LENGKAP ---------- */
+function screenNotes(){
+  return `
+    <div class="topbar"><button class="back" onclick="goBack()">← Kembali</button></div>
+    <h2>📘 Nota Lengkap: Pelan & Dongakan</h2>
+    <div class="card">
+      <h3>1. Pelan vs Dongakan</h3>
+      <div class="databox pos">Pelan: pandangan dari ATAS</div>
+      <div class="databox pos">Dongakan: pandangan dari HADAPAN/SISI</div>
+    </div>
+    <div class="card">
+      <h3>2. Jenis Garis</h3>
+      <div class="databox">Garis padu tebal: sisi NAMPAK</div>
+      <div class="databox neg">Garis sempang: sisi TERLINDUNG (tidak nampak)</div>
+      <div class="databox">Garis padu halus: garis binaan</div>
+    </div>
+    <div class="card">
+      <h3>3. Sintesis: Gabungkan untuk Cari Bentuk 3D</h3>
+      <p><b>Contoh Lengkap:</b> Pelan=bulatan, dongakan=segi empat tepat. Apakah bentuk objek?</p>
+      <div class="databox">Bulatan (atas) + segi empat tepat (sisi) = SILINDER</div>
+      <p class="muted" style="margin-top:8px;"><b>⚠️ Miskonsepsi biasa:</b> "Pelan sahaja mencukupi untuk tentukan bentuk 3D" — INI SALAH. Objek berbeza boleh ada pelan sama tetapi dongakan berbeza; perlu GABUNGAN kedua-duanya.</p>
+    </div>
+    <div class="card">
+      <h3>📌 Rumusan Pantas</h3>
+      <div class="databox">• Pelan = atas; Dongakan = hadapan/sisi</div>
+      <div class="databox">• Garis tebal=nampak; garis sempang=terlindung</div>
+      <div class="databox">• Perlu pelan DAN dongakan untuk tentukan bentuk 3D</div>
+    </div>
+    <button class="btn btn-primary" onclick="goTo('moduleMenu')">Faham, Sedia untuk Latihan →</button>
+  `;
+}
+
+/* ---------- MENU MODUL ---------- */
+function screenModuleMenu(){
+  const items = [
+    {key:"A", label:"Modul A · Lukis Pelan & Dongakan", sp:"7.2.1", screen:"moduleA"},
+    {key:"B", label:"Modul B · Sintesis & Lakar", sp:"7.2.2", screen:"moduleB"},
+    {key:"C", label:"Modul C · Penyelesaian Masalah", sp:"7.2.3", screen:"moduleC"}
+  ];
+  const doneCount = Object.values(state.moduleDone).filter(Boolean).length;
+  const rows = items.map((it, idx)=>{
+    const done = state.moduleDone[it.key];
+    const prevDone = idx===0 ? true : state.moduleDone[items[idx-1].key];
+    const locked = !prevDone && !done;
+    return `<div class="module-row ${locked?'locked':''}" onclick="${locked? '': `openModule('${it.screen}')`}">
+      <div><div style="font-weight:700;">${it.label}</div><div class="muted" style="font-size:0.78rem;">SP ${it.sp}</div></div>
+      <div>${done ? "✅" : (locked ? "🔒" : "▶️")}</div>
+    </div>`;
+  }).join("");
+  return `
+    <div class="topbar"><span class="muted">Latihan Berpandu</span></div>
+    <h2>🧭 Peta Modul</h2>
+    <div class="progressbar"><div style="width:${(doneCount/3)*100}%"></div></div>
+    ${rows}
+    ${doneCount===3 ? `<button class="btn btn-primary" onclick="goTo('bankIntro')">Semua Modul Selesai — Teruskan →</button>` : `<p class="muted" style="text-align:center;">Selesaikan semua modul untuk buka Bank Soalan.</p>`}
+  `;
+}
+function openModule(screen){ state.qIndex=0; goTo(screen); }
+
+/* ---------- MODUL GENERIK ---------- */
+function getModuleData(key){
+  if(key==="A") return modA;
+  if(key==="B") return modB;
+  if(key==="C") return modC;
+  return [];
+}
+function screenModule(key, questions, title){
+  const i = state.qIndex;
+  if(i >= questions.length){
+    state.moduleDone[key] = true; saveState();
+    return `<h2>✅ ${title} — Selesai!</h2><p class="muted">Tahniah! Anda telah menguasai bahagian ini.</p><button class="btn btn-primary" onclick="goTo('moduleMenu')">Kembali ke Peta Modul →</button>`;
+  }
+  const q = questions[i];
+  return `
+    <div class="topbar"><button class="back" onclick="goTo('moduleMenu')">← Peta Modul</button></div>
+    <h3>${title}</h3>
+    <div class="progressbar"><div style="width:${(i/questions.length)*100}%"></div></div>
+    <div class="card">
+      <p style="font-weight:600;">${q.stem}</p>
+      <div>${q.options.map((o,idx)=>`<button class="btn-option" id="opt-${q.id}-${idx}" onclick="answerModule('${key}', '${q.id}', ${idx})">${o}</button>`).join("")}</div>
+      <div id="fb-${q.id}"></div>
+    </div>
+  `;
+}
+function answerModule(key, qid, idx){
+  const questions = getModuleData(key);
+  const q = questions.find(x=>x.id===qid);
+  if(!q || q._answered) return;
+  q._answered = true;
+  const correct = idx === q.correct;
+  q.options.forEach((o,oi)=>{
+    const btn = document.getElementById(`opt-${qid}-${oi}`);
+    btn.classList.add("disabled");
+    if(oi===q.correct) btn.classList.add("correct");
+    else if(oi===idx) btn.classList.add("wrong");
+  });
+  const fb = document.getElementById(`fb-${qid}`);
+  fb.className = "feedback " + (correct ? "ok" : "no");
+  fb.innerHTML = (correct ? "✅ Betul! " : "❌ Belum tepat. ") + q.explain;
+  fb.insertAdjacentHTML("afterend", `<button class="btn btn-primary" onclick="advanceModule('${key}')">Seterusnya →</button>`);
+  logAnswer(state.practiceLog, { id:q.id, module:key, question:q.stem, chosen:q.options[idx], correctAns:q.options[q.correct], correct, level:"Latihan Berpandu" });
+}
+function advanceModule(key){ getModuleData(key).forEach(q=>{ q._answered=false; }); state.qIndex++; saveState(); render(); }
+
+/* ---------- BANK SOALAN ---------- */
+function screenBankIntro(){
+  return `
+    <h2>🏆 Bank Soalan 4 Aras</h2>
+    <div class="card">
+      <p>8 soalan merentasi 4 aras kesukaran:</p>
+      <div class="databox"><span class="badge-level lvl-rendah">RENDAH</span> Ingat & kenal pasti fakta asas</div>
+      <div class="databox"><span class="badge-level lvl-sederhana">SEDERHANA</span> Aplikasi prosedur biasa</div>
+      <div class="databox"><span class="badge-level lvl-tinggi">TINGGI</span> Analisis & multi-langkah</div>
+      <div class="databox"><span class="badge-level lvl-kbat">KBAT</span> Penaakulan & konteks sebenar</div>
+      <p class="muted" style="margin-bottom:0;">Jika tersilap pada aras Tinggi/KBAT, petunjuk akan diberikan.</p>
+    </div>
+    <button class="btn btn-primary" onclick="goTo('bank', true)">Mula Bank Soalan →</button>
+  `;
+}
+function screenBank(){
+  const i = state.qIndex;
+  if(i >= bank.length){
+    return `<h2>✅ Bank Soalan Selesai</h2><p class="muted">Bersedia untuk cabaran akhir?</p><button class="btn btn-primary" onclick="goTo('exitTicket', true)">Ke Tiket Keluar →</button>`;
+  }
+  const q = bank[i];
+  const lvlClass = {"Rendah":"lvl-rendah","Sederhana":"lvl-sederhana","Tinggi":"lvl-tinggi","KBAT":"lvl-kbat"}[q.level];
+  return `
+    <div class="topbar"><span class="muted">Soalan ${i+1}/${bank.length}</span></div>
+    <div class="progressbar"><div style="width:${(i/bank.length)*100}%"></div></div>
+    <div class="card">
+      <span class="badge-level ${lvlClass}">${q.level}</span>
+      <p style="font-weight:600;">${q.stem}</p>
+      <div>${q.options.map((o,idx)=>`<button class="btn-option" id="optBank-${idx}" onclick="answerBank(${idx})">${o}</button>`).join("")}</div>
+      <div id="fbBank"></div>
+      <div id="hintBank"></div>
+    </div>
+  `;
+}
+function answerBank(idx){
+  const i = state.qIndex;
+  const q = bank[i];
+  if(q._answered) return;
+  const correct = idx === q.correct;
+  const needsScaffold = !correct && (q.level==="Tinggi" || q.level==="KBAT") && !q._hinted;
+  if(needsScaffold){
+    q._hinted = true; state.hintsUsedTotal++; saveState();
+    document.getElementById("hintBank").innerHTML = `<div class="hint-box">💡 Petunjuk: Bayangkan bentuk yang muncul dari pandangan ATAS (pelan) dan pandangan HADAPAN/SISI (dongakan) untuk gabungkan bentuk 3D.</div>`;
+    return;
+  }
+  q._answered = true;
+  q.options.forEach((o,oi)=>{
+    const btn = document.getElementById(`optBank-${oi}`);
+    btn.classList.add("disabled");
+    if(oi===q.correct) btn.classList.add("correct");
+    else if(oi===idx) btn.classList.add("wrong");
+  });
+  const fb = document.getElementById("fbBank");
+  fb.className = "feedback " + (correct ? "ok" : "no");
+  fb.innerHTML = (correct ? "✅ Betul! " : "❌ Belum tepat. ") + q.explain;
+  fb.insertAdjacentHTML("afterend", `<button class="btn btn-primary" onclick="advanceBank()">Seterusnya →</button>`);
+  logAnswer(state.bankLog, { id:q.id, question:q.stem, chosen:q.options[idx], correctAns:q.options[q.correct], correct, level:q.level });
+}
+function advanceBank(){ state.qIndex++; saveState(); render(); }
+
+/* ---------- TIKET KELUAR ---------- */
+function screenExit(){
+  const i = state.qIndex;
+  if(i >= exitQ.length){
+    state.endTime = Date.now(); saveState();
+    return `<h2>🎉 Tugasan Bilik Lukisan Selesai!</h2><p class="muted">Tekan butang di bawah untuk lihat Ringkasan penuh.</p><button class="btn btn-gold" onclick="goTo('summary')">Lihat Ringkasan →</button>`;
+  }
+  const q = exitQ[i];
+  return `
+    <div class="topbar"><span class="muted">Tiket Keluar ${i+1}/${exitQ.length}</span></div>
+    <div class="progressbar"><div style="width:${(i/exitQ.length)*100}%"></div></div>
+    <div class="card">
+      <p style="font-weight:600;">${q.stem}</p>
+      <div>${q.options.map((o,idx)=>`<button class="btn-option" id="optExit-${idx}" onclick="answerExit(${idx})">${o}</button>`).join("")}</div>
+      <div id="fbExit"></div>
+    </div>
+  `;
+}
+function answerExit(idx){
+  const i = state.qIndex;
+  const q = exitQ[i];
+  if(q._answered) return;
+  q._answered = true;
+  const correct = idx === q.correct;
+  q.options.forEach((o,oi)=>{
+    const btn = document.getElementById(`optExit-${oi}`);
+    btn.classList.add("disabled");
+    if(oi===q.correct) btn.classList.add("correct");
+    else if(oi===idx) btn.classList.add("wrong");
+  });
+  const fb = document.getElementById("fbExit");
+  fb.className = "feedback " + (correct ? "ok" : "no");
+  fb.innerHTML = (correct ? "✅ Betul! " : "❌ Belum tepat. ") + q.explain;
+  fb.insertAdjacentHTML("afterend", `<button class="btn btn-primary" onclick="advanceExit()">Seterusnya →</button>`);
+  logAnswer(state.exitLog, { id:q.id, question:q.stem, chosen:q.options[idx], correctAns:q.options[q.correct], correct, level:"Tiket Keluar" });
+}
+function advanceExit(){ state.qIndex++; saveState(); render(); }
+
+/* ---------- RINGKASAN ---------- */
+function allLogs(){ return [].concat(state.diagLog, state.practiceLog, state.bankLog, state.exitLog); }
+function screenSummary(){
+  const logs = allLogs();
+  const gradedLogs = [].concat(state.practiceLog, state.bankLog, state.exitLog);
+  const totalCorrect = gradedLogs.filter(l=>l.correct).length;
+  const totalQ = gradedLogs.length;
+  const pct = totalQ ? Math.round((totalCorrect/totalQ)*100) : 0;
+  let masteryLabel = "Tahap 1 — Asas";
+  if(pct>=80) masteryLabel = "Tahap 3 — Cemerlang 📐";
+  else if(pct>=60) masteryLabel = "Tahap 2 — Baik";
+  const durationSec = state.endTime && state.startTime ? Math.round((state.endTime-state.startTime)/1000) : 0;
+  const mins = Math.floor(durationSec/60), secs = durationSec%60;
+  const listItems = logs.map(l=>{
+    return `<div class="scoreitem">
+      <div>${l.level ? `<span class="muted">[${l.level}]</span> ` : ""}${escapeHtml(l.question)}</div>
+      <div>${l.correct ? '<span class="ok-tag">✔ Betul</span>' : '<span class="no-tag">✘ Salah</span>'} — Jawapan anda: <b>${escapeHtml(l.chosen)}</b>${l.correct ? "" : ` | Jawapan betul: <b>${escapeHtml(l.correctAns)}</b>`}</div>
+    </div>`;
+  }).join("");
+  return `
+    <h2>📋 Ringkasan Bilik Lukisan</h2>
+    <div class="card">
+      <p style="margin-bottom:4px;"><b>Nama:</b> ${escapeHtml(state.name)}</p>
+      <p style="margin-bottom:0;"><b>Kelas:</b> ${escapeHtml(state.kelas)}</p>
+    </div>
+    <div class="statrow">
+      <div class="statbox"><div class="num">${totalCorrect}/${totalQ}</div><div class="lbl">Markah</div></div>
+      <div class="statbox"><div class="num">${pct}%</div><div class="lbl">Peratus</div></div>
+      <div class="statbox"><div class="num">${mins}m ${secs}s</div><div class="lbl">Masa</div></div>
+    </div>
+    <div class="card" style="text-align:center;"><div class="pill" style="font-size:0.85rem;">${masteryLabel}</div></div>
+    <h3>Log Jawapan Terperinci</h3>
+    <div class="scorelist">${listItems}</div>
+    <button class="btn btn-ghost" onclick="goTo('confirmReset')">🔄 Set Semula & Cuba Lagi</button>
+    <p class="footer-note">SK 7.2 Pelan & Dongakan · KSSM Matematik Tingkatan 3 · ${VERSION}<br>Sila tangkap skrin ini untuk dihantar kepada guru.</p>
+  `;
+}
+
+/* ---------- RESET ---------- */
+function screenConfirmReset(){
+  return `
+    <h2>⚠️ Sahkan Set Semula</h2>
+    <div class="card"><p>Tindakan ini akan memadam semua rekod jawapan dan markah anda untuk permulaan baharu. Tindakan ini tidak boleh diundur.</p></div>
+    <button class="btn btn-primary" style="background:var(--negative);" onclick="doReset()">Ya, Padam & Mula Semula</button>
+    <button class="btn btn-ghost" onclick="goBack()">Batal, Kembali</button>
+  `;
+}
+function doReset(){ localStorage.removeItem(STORAGE_KEY); state = freshState(); render(); }
+
+/* ---------- UTIL ---------- */
+function escapeHtml(str){
+  if(str === undefined || str === null) return "";
+  return String(str).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+}
+
+/* ---------- MULA ---------- */
+render();
+</script>
+</body>
+</html>
